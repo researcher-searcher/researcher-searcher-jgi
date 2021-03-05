@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import requests
+from bs4 import BeautifulSoup
 
 def read_emails():
     df = pd.read_csv('data/email.txt',names=['email'])
@@ -19,16 +20,17 @@ def read_emails():
 def uob_finder_web(email):
     print(f'Searching for {email}')
     #https://research-information.bris.ac.uk/en/searchAll/advanced/?searchByRadioGroup=PartOfNameOrTitle&searchBy=PartOfNameOrTitle&allThese=&exactPhrase=ben.elsworth%40bristol.ac.uk&or=&minus=&family=persons&doSearch=Search&slowScroll=true&resultFamilyTabToSelect=
-    url="https://research-information.bris.ac.uk/en/searchAll/advanced/?searchByRadioGroup=PartOfNameOrTitle&searchBy=PartOfNameOrTitle&allThese=&exactPhrase=ben.elsworth%40bristol.ac.uk&or=&minus=&family=persons&doSearch=Search&slowScroll=true&resultFamilyTabToSelect="
-    payload={
+    url=f"https://research-information.bris.ac.uk/en/searchAll/advanced/?exactPhrase={email}&or=&minus=&family=persons&doSearch=Search&slowScroll=true&resultFamilyTabToSelect="
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    find_person = soup.find_all("a", class_="link person")
+    print(len(find_person))
+    if len(find_person)==1:
+        print(find_person)
+    else:
+        print(f'Error, more than one person {len(find_person)} \n{find_person}')
 
-    }
-    res = requests.get(url,data=payload)
-    print(res.text)
-    # looking for one of these
-    #<a rel="Person" href="https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth" class="link person"><span>Dr Benjamin L Elsworth</span></a>
-
-
-#email_df = emails()
-uob_finder_web(email='ben.elsworth@bristol.ac.uk')
+email_df = read_emails()
+for i,row in email_df.head().iterrows():
+    uob_finder_web(email=row['email'])
 
