@@ -42,9 +42,8 @@ def uob_finder_web(email):
             person_info={'page':person_page,'name':name,'email':email}
     if person_info == False:
         print('No page found')
-        return 'NA'
-    else:
-        return person_info
+        person_info={'page':'NA','name':'NA','email':email}
+    return person_info
 
 def get_all_people(email_df):
     person_data = []
