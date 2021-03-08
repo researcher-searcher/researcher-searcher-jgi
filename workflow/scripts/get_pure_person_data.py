@@ -6,12 +6,11 @@ from dataclasses import dataclass
 from simple_parsing import ArgumentParser
 
 parser = ArgumentParser()
-parser.add_argument("--email-file", type=str, help="List of email addresses")
+parser.add_argument("--file", type=str, help="List of email addresses")
 
 @dataclass
 class Options:
     """ Help string for this group of command-line arguments """
-    #email_file: str  # Path to email file    
     top: int = -1 # How many emails to read
 
 parser.add_arguments(Options, dest="options")
@@ -21,7 +20,7 @@ print(args)
 print("options:", args.options.top)
 
 def read_emails():
-    df = pd.read_csv(args.email_file,names=['email'])
+    df = pd.read_csv(args.file,names=['email'])
     print(df.head())
 
     # check for dups

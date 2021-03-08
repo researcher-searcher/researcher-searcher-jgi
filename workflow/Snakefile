@@ -11,5 +11,13 @@ rule get_person_data:
     output: os.path.join('workflow/results/person_pages.tsv')
     shell: 
         """
-        python -m workflow.scripts.get_pure_person_data --email-file {input} --top 5
+        python -m workflow.scripts.get_pure_person_data --file {input} --top 5
+        """
+
+rule get_research_output:
+    input: os.path.join('workflow/results/person_pages.tsv')
+    output: os.path.join('workflow/results/research_meta_data.tsv')
+    shell:
+        """
+        python -m workflow.scripts.get_research_output --file {input} --top 5
         """
