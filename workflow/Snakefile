@@ -21,7 +21,7 @@ rule get_person_data:
         """
 
 rule get_research_output:
-    input: os.path.join('workflow/results/person_pages.tsv')
+    input: os.path.join('workflow/results/person_data.tsv')
     output: os.path.join('workflow/results/research_meta_data.tsv')
     shell:
         """

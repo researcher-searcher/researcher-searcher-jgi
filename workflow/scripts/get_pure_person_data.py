@@ -17,12 +17,9 @@ class Options:
 parser.add_arguments(Options, dest="options")
 
 args = parser.parse_args()
-print(args)
-print("options:", args.options.top)
 
 def read_file():
     person_df = pd.read_csv(args.file,sep='\t')
-    print(person_df.head())
     return person_df
 
 def create_research_data(person_df):

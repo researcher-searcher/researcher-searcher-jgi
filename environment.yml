@@ -21,3 +21,5 @@ dependencies:
     - wget
     - snakemake>=5.27
     - simple-parsing
+    - spacy
+    - scispacy
