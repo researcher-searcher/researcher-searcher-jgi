@@ -20,3 +20,4 @@ dependencies:
   - pip:
     - wget
     - snakemake>=5.27
+    - simple-parsing

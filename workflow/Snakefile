@@ -1,0 +1,15 @@
+import os
+import pandas as pd
+import yaml
+
+configfile: 'config/data.yaml'
+
+print(config['emails'][0])
+
+rule get_person_data:
+    input: config['emails'][0]
+    output: os.path.join('workflow/results/person_pages.tsv')
+    shell: 
+        """
+        python -m workflow.scripts.get_pure_person_data --email-file {input} --top 5
+        """
