@@ -56,7 +56,7 @@ def create_research_data(df):
             abstract_data = get_research_data(rows['url'])
             #logger.debug(abstract_data)
             try:
-                d['abstract']=abstract_data.getText()
+                d['abstract']=abstract_data.getText().strip().replace('\n',' ')
                 logger.debug(abstract_data.getText())
             except:
                 logger.warning(f"No abstract for {rows['url']}")
