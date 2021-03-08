@@ -42,9 +42,9 @@ def create_research_data(df):
             data = existing_df.to_dict('records')
         except:
             logger.warning(f'Error when reading {f}')
-        logger.debug(data)
+        logger.debug(f'Got data on {len(existing_data)} urls')
 
-    for i,rows in df.head(n=1).iterrows():
+    for i,rows in df.iterrows():
         if rows['url'] in existing_data:
             logger.debug(f"{rows['url']} already done")
         else:
@@ -53,15 +53,15 @@ def create_research_data(df):
                 'abstract':'NA',
             }
             abstract_data = get_research_data(rows['url'])
-            logger.debug(abstract_data)
+            #logger.debug(abstract_data)
             try:
                 d['abstract']=abstract_data.getText()
-                logger.debug(x.getText())
+                logger.debug(abstract_data.getText())
             except:
                 logger.warning(f"No abstract for {rows['url']}")
         
             data.append(d)
-    logger.info(data)
+    #logger.debug(data)
     research_details = pd.DataFrame(data)
     research_details.to_csv('workflow/results/research_data.tsv',sep='\t',index=False)
     
