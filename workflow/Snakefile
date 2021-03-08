@@ -6,9 +6,17 @@ configfile: 'config/data.yaml'
 
 print(config['emails'][0])
 
-rule get_person_data:
+rule get_person:
     input: config['emails'][0]
     output: os.path.join('workflow/results/person_pages.tsv')
+    shell: 
+        """
+        python -m workflow.scripts.get_pure_person --file {input} --top 5
+        """
+
+rule get_person_data:
+    input: os.path.join('workflow/results/person_pages.tsv')
+    output: os.path.join('workflow/results/person_data.tsv')
     shell: 
         """
         python -m workflow.scripts.get_pure_person_data --file {input} --top 5
@@ -19,5 +27,5 @@ rule get_research_output:
     output: os.path.join('workflow/results/research_meta_data.tsv')
     shell:
         """
-        python -m workflow.scripts.get_research_output --file {input} --top 5
+        python -m workflow.scripts.get_pure_research_output --file {input} --top 5
         """
