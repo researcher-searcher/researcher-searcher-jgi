@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
+from loguru import logger
 
 parser = ArgumentParser()
 parser.add_argument("--file", type=str, help="File of people")
