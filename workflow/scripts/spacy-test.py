@@ -29,6 +29,7 @@ research_df = pd.merge(research_meta_df,abstract_df,left_on='url',right_on='url'
 logger.info(research_df.shape)
 
 # create single string of text
+# maybe just leave titles and abstract separate if treating each sentence separately
 textList=[]
 for i,rows in research_df.iterrows():
     if not isinstance(rows['abstract'],float):
@@ -39,8 +40,8 @@ research_df['text']=textList
 logger.debug(research_df.head())
 
 def run_nlp(research_df):
-    titles = list(research_df['text'])
-    docs = list(nlp.pipe(titles))
+    text = list(research_df['text'])
+    docs = list(nlp.pipe(text))
     for doc in docs:
         logger.info(doc)
         assert doc.has_annotation("SENT_START")
@@ -50,7 +51,7 @@ def run_nlp(research_df):
             # Analyze syntax
             logger.debug(f"Noun phrases: {[chunk.text for chunk in doc.noun_chunks]}")
             logger.debug(f"Verbs: {[token.lemma_ for token in doc if token.pos_ == 'VERB']}")
-            #print("All:", [token.lemma_ for token in doc])
+            #logger.debug(f"All: {[token.lemma_ for token in doc]}")
 
             # Find named entities, phrases and concepts
             for entity in doc.ents:
