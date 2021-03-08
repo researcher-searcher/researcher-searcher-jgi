@@ -4,14 +4,12 @@ import yaml
 
 configfile: 'config/data.yaml'
 
-print(config['emails'][0])
-
 rule get_person:
     input: config['emails'][0]
     output: os.path.join('workflow/results/person_pages.tsv')
     shell: 
         """
-        python -m workflow.scripts.get_pure_person --file {input} --top 5
+        python -m workflow.scripts.find_pure_people --file {input} --top 5
         """
 
 rule get_person_data:
@@ -19,7 +17,7 @@ rule get_person_data:
     output: os.path.join('workflow/results/person_data.tsv')
     shell: 
         """
-        python -m workflow.scripts.get_pure_person_data --file {input} --top 5
+        python -m workflow.scripts.get_pure_person_data --file {input}
         """
 
 rule get_research_output:
@@ -27,5 +25,13 @@ rule get_research_output:
     output: os.path.join('workflow/results/research_meta_data.tsv')
     shell:
         """
-        python -m workflow.scripts.get_pure_research_output --file {input} --top 5
+        python -m workflow.scripts.get_pure_research_metadata --file {input}
+        """
+
+rule get_research_details:
+    input: os.path.join('workflow/results/research_meta_data.tsv')
+    output: os.path.join('workflow/results/research_data.complete')
+    shell:
+        """
+        python -m workflow.scripts.get_pure_research_data --file {input}
         """

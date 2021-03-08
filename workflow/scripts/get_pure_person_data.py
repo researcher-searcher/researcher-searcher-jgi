@@ -7,7 +7,7 @@ from simple_parsing import ArgumentParser
 from loguru import logger
 
 parser = ArgumentParser()
-parser.add_argument("--file", type=str, help="List of email addresses")
+parser.add_argument("--file", type=str, help="File of starting email addresses")
 
 @dataclass
 class Options:
