@@ -23,6 +23,7 @@ logger.debug("options:", args.options.top)
 
 def read_file():
     df = pd.read_csv(args.file,sep='\t')
+    df.drop_duplicates(subset='url',inplace=True)
     logger.debug(df.head())
     return df
 
