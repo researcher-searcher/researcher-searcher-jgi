@@ -10,7 +10,7 @@ from spacy import displacy
 #nlp = spacy.load("en_core_web_sm")
 #nlp = spacy.load("en_core_web_lg")
 #nlp = spacy.load("en_core_sci_scibert")
-nlp = spacy.load("en_core_sci_lg")
+#nlp = spacy.load("en_core_sci_lg")
 nlp = spacy.load("en_ner_bionlp13cg_md")
 nlp.add_pipe("abbreviation_detector")
 
@@ -47,10 +47,11 @@ def create_texts():
             textList.append(rows['title'])
     research_df['text']=textList
     logger.debug(research_df.head())
-    return research_df.tail(n=10)
+    return research_df.tail()
 
 def run_nlp(research_df):
     data = []
+    vector_data = []
     text = list(research_df['text'])
     docs = list(nlp.pipe(text))
     for i in range(0,len(docs)):
@@ -70,18 +71,22 @@ def run_nlp(research_df):
             #logger.info(html)
 
             logger.info(sent.text)
+
+            # create vectors
             #print(doc.vector)
+            vector_data.append({'url':df_row['url'],'sent':sent_num,'vector':list(sent.vector)})
+
             # Analyze syntax
             noun_phrases=[]
             for chunk in sent.noun_chunks:
-                logger.debug(chunk)
-                #remove stopwords
+                #logger.debug(chunk)
+                #remove stopwords and things
                 if all(token.is_stop != True and token.is_punct != True and '-PRON-' not in token.lemma_ for token in chunk) == True:
-                    #if len(chunk) > 1:
-                    noun_phrases.append(chunk)
-                    data.append({'url':df_row['url'],'sent':sent_num,'noun_phrase':chunk})
-            #logger.debug(f"Noun phrases: {[chunk.text for chunk in doc.noun_chunks]}")
-            logger.info(f"Noun phrases: {noun_phrases}")
+                    # not sure if should filter on number of words in chunk?
+                    if len(chunk) > 1:
+                        noun_phrases.append(chunk)
+                        data.append({'url':df_row['url'],'sent':sent_num,'noun_phrase':chunk})
+            #logger.info(f"Noun phrases: {noun_phrases}")
             logger.info(f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}")
             #logger.debug(f"All: {[token.lemma_ for token in doc]}")
 
@@ -94,6 +99,11 @@ def run_nlp(research_df):
     #logger.info(data)
     df = pd.DataFrame(data)
     logger.info(df.head())
+    df.to_csv('workflow/results/sentence_spacy.tsv',sep='\t',index=False)
+
+    df = pd.DataFrame(vector_data)
+    logger.info(df.head())
+    df.to_csv('workflow/results/sentence_spacy_vector.tsv',sep='\t',index=False)
 
 research_df = create_texts()
 run_nlp(research_df)
