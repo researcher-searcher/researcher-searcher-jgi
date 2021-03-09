@@ -3,12 +3,15 @@ import spacy
 import pandas as pd
 from loguru import logger
 from scispacy.abbreviation import AbbreviationDetector
+from spacy import displacy
+
 
 # Load English tokenizer, tagger, parser and NER
 #nlp = spacy.load("en_core_web_sm")
 #nlp = spacy.load("en_core_web_lg")
 #nlp = spacy.load("en_core_sci_scibert")
 nlp = spacy.load("en_core_sci_lg")
+nlp = spacy.load("en_ner_bionlp13cg_md")
 nlp.add_pipe("abbreviation_detector")
 
 # do we need to filter stopwords?
@@ -38,7 +41,7 @@ def create_texts():
     # maybe just leave titles and abstract separate if treating each sentence separately
     textList=[]
     for i,rows in research_df.iterrows():
-        if not isinstance(rows['abstract'],float):
+        if not type(rows['abstract']) == float:
             textList.append(f"{rows['title']} {rows['abstract']}")
         else:
             textList.append(rows['title'])
@@ -55,6 +58,12 @@ def run_nlp(research_df):
         #logger.info(tokens)
         assert doc.has_annotation("SENT_START")
         for sent in doc.sents:
+            
+            #displacy
+            #html = displacy.render(doc, style="dep", page=True, minify=True)
+            #dis = displacy.serve(doc, style="ent")
+            #logger.info(html)
+
             logger.info(sent.text)
             #print(doc.vector)
             # Analyze syntax
