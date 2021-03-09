@@ -59,7 +59,6 @@ def run_nlp(research_df):
         logger.info(doc)
         df_row=research_df.iloc[i]
         logger.info(f'{i} {len(docs)}')
-        #tokens = [token.text for token in doc if not token.is_stop]
         #logger.info(tokens)
         assert doc.has_annotation("SENT_START")
         sent_num=0
@@ -94,8 +93,7 @@ def run_nlp(research_df):
             for entity in sent.ents:
                 logger.debug(f'entity: {entity} #entity.text: {entity.text} entity.label_:{entity.label_}')
             sent_num+=1
-        #for abrv in doc._.abbreviations:
-	    #    logger.warning(f"{abrv} \t ({abrv.start}, {abrv.end}) {abrv._.long_form} {abrv.label_}")
+
     #logger.info(data)
     df = pd.DataFrame(data)
     logger.info(df.head())
@@ -103,7 +101,10 @@ def run_nlp(research_df):
 
     df = pd.DataFrame(vector_data)
     logger.info(df.head())
-    df.to_csv('workflow/results/sentence_spacy_vector.tsv',sep='\t',index=False)
+    df.to_pickle('workflow/results/sentence_spacy_vector.pkl.gz')
+
+    #unpickled_df = pd.read_pickle('workflow/results/sentence_spacy_vector.pkl.gz')
+    #logger.info(unpickled_df.head())
 
 research_df = create_texts()
 run_nlp(research_df)
