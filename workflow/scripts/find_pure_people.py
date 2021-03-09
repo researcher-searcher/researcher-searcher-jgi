@@ -35,7 +35,9 @@ def read_emails():
     logger.debug(f'Removing {bad_emails.shape[0]} bad emails, see them here results/bad_emails.txt')
 
     df = df[email_check]
+    logger.debug(f'Left with {df.shape[0]} emails')
 
+    # use top argument for testing
     if args.options.top:
         logger.debug(f'Keeping top {args.options.top}')
         df = df.head(n=args.options.top) 

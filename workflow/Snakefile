@@ -9,7 +9,7 @@ rule get_person:
     output: os.path.join('workflow/results/person_pages.tsv')
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --file {input} --top 2
+        python -m workflow.scripts.find_pure_people --file {input} --top 20
         """
 
 rule get_person_data:
@@ -22,16 +22,23 @@ rule get_person_data:
 
 rule get_research_output:
     input: os.path.join('workflow/results/person_data.tsv')
-    output: os.path.join('workflow/results/research_meta_data.tsv')
+    output: os.path.join('workflow/results/research_metadata.complete')
     shell:
         """
         python -m workflow.scripts.get_pure_research_metadata --file workflow/results/person_pages.tsv
         """
 
 rule get_research_details:
-    input: os.path.join('workflow/results/research_meta_data.tsv')
+    input: os.path.join('workflow/results/research_metadata.complete')
     output: os.path.join('workflow/results/research_data.complete')
     shell:
         """
         python -m workflow.scripts.get_pure_research_data --file {input}
+        """
+
+rule clean_for_build:
+    shell:
+        """
+        echo 'Deleting: workflow/results/*.complete'
+        rm -f rm workflow/results/*.complete
         """

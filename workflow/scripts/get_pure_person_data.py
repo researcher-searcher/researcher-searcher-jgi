@@ -65,12 +65,16 @@ def create_research_data(person_df):
     person_details.to_csv('workflow/results/person_data.tsv',sep='\t',index=False)
 
 def get_person_data(url):
-    print(url)
-    res = requests.get(url)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    person_data = soup.find("div", class_="rendering rendering_person rendering_personorganisationlistrendererportal rendering_person_personorganisationlistrendererportal")
-    orcid_data = soup.find("a",class_="orcid")
-    logger.debug(orcid_data)
+    logger.debug(url)
+    try:
+        res = requests.get(url)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        person_data = soup.find("div", class_="rendering rendering_person rendering_personorganisationlistrendererportal rendering_person_personorganisationlistrendererportal")
+        orcid_data = soup.find("a",class_="orcid")
+        logger.debug(orcid_data)
+    except:
+        logger.warning(f"get_person_data failed")
+        person_data = orcid_data = 'NA'
     return person_data,orcid_data
 
 person_df = read_file()

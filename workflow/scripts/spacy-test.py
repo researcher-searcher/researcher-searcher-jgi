@@ -5,9 +5,12 @@ from loguru import logger
 
 # Load English tokenizer, tagger, parser and NER
 #nlp = spacy.load("en_core_web_sm")
-nlp = spacy.load("en_core_web_lg")
+#nlp = spacy.load("en_core_web_lg")
 #nlp = spacy.load("en_core_sci_scibert")
+nlp = spacy.load("en_core_sci_lg")
 
+# do we need to filter stopwords?
+spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 
 #from spacy.tokens import Doc
 
@@ -44,9 +47,12 @@ def run_nlp(research_df):
     docs = list(nlp.pipe(text))
     for doc in docs:
         logger.info(doc)
+        #tokens = [token.text for token in doc if not token.is_stop]
+        #logger.info(tokens)
         assert doc.has_annotation("SENT_START")
         for sent in doc.sents:
             logger.info(sent.text)
+            #remoe stopwords
             #print(doc.vector)
             # Analyze syntax
             logger.debug(f"Noun phrases: {[chunk.text for chunk in doc.noun_chunks]}")
