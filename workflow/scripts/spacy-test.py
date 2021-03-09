@@ -50,13 +50,18 @@ def create_texts():
     return research_df.tail(n=10)
 
 def run_nlp(research_df):
+    data = []
     text = list(research_df['text'])
     docs = list(nlp.pipe(text))
-    for doc in docs:
+    for i in range(0,len(docs)):
+        doc = docs[i]
         logger.info(doc)
+        df_row=research_df.iloc[i]
+        logger.info(f'{i} {len(docs)}')
         #tokens = [token.text for token in doc if not token.is_stop]
         #logger.info(tokens)
         assert doc.has_annotation("SENT_START")
+        sent_num=0
         for sent in doc.sents:
             
             #displacy
@@ -74,19 +79,21 @@ def run_nlp(research_df):
                 if all(token.is_stop != True and token.is_punct != True and '-PRON-' not in token.lemma_ for token in chunk) == True:
                     #if len(chunk) > 1:
                     noun_phrases.append(chunk)
+                    data.append({'url':df_row['url'],'sent':sent_num,'noun_phrase':chunk})
             #logger.debug(f"Noun phrases: {[chunk.text for chunk in doc.noun_chunks]}")
             logger.info(f"Noun phrases: {noun_phrases}")
             logger.info(f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}")
             #logger.debug(f"All: {[token.lemma_ for token in doc]}")
 
-            # Find named entities, phrases and concepts
-            # This is unlikely to be of use
+            # Find named entities, phrases and concepts - can use 
             for entity in sent.ents:
                 logger.debug(f'entity: {entity} #entity.text: {entity.text} entity.label_:{entity.label_}')
-
-        for abrv in doc._.abbreviations:
-	        logger.warning(f"{abrv} \t ({abrv.start}, {abrv.end}) {abrv._.long_form} {abrv.label_}")
-
+            sent_num+=1
+        #for abrv in doc._.abbreviations:
+	    #    logger.warning(f"{abrv} \t ({abrv.start}, {abrv.end}) {abrv._.long_form} {abrv.label_}")
+    #logger.info(data)
+    df = pd.DataFrame(data)
+    logger.info(df.head())
 
 research_df = create_texts()
 run_nlp(research_df)
