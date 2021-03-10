@@ -80,6 +80,7 @@ def run_nlp(research_df):
         logger.info('No new data')
         mark_as_complete(args.output)
         exit()
+        
     vector_data = []
 
     nlp = load_model()
