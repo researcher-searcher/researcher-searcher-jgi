@@ -13,7 +13,13 @@ def query_vector_data():
     nlp = load_spacy_model()
     #test_sent = 'school and family'
     #test_sent = 'coronary heart disease'
-    test_sent = 'machine learning'
+    #test_sent = 'machine learning'
+    #test_sent = 'Bioinformatics computational biology'
+    #test_sent = 'genome wide association studies gwas'
+    #test_sent = 'Mendelian randomization'
+    #test_sent = 'gwas'
+    test_sent = 'What are the risk factors of breast cancer?'
+    test_sent = 'breast cancer'
     doc = nlp(test_sent)
     doc_vec = doc.vector
     res = query_record(index_name=index_name,query_vector=doc_vec)
@@ -24,5 +30,8 @@ def query_vector_data():
 
 #index_vector_data()
 res = query_vector_data()
-for r in res:
-    print(r)
+if res:
+    for r in res:
+        logger.info(r)
+else:
+    logger.info('No results')

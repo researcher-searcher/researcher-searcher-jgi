@@ -17,7 +17,7 @@ rule get_person:
     output: PERSON_DATA
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 1
+        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 100
         """
 
 rule get_person_data:
