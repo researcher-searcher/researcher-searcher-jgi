@@ -5,9 +5,10 @@ services:
   # Elasticsearch Docker Images: https://www.docker.elastic.co/
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
-    container_name: elasticsearch
+    container_name: researcher-searcher-elasticsearch
     environment:
       #- xpack.security.enabled=false
+      - cluster.name=es-researcher-searcher
       - discovery.type=single-node
     ulimits:
       memlock:
@@ -25,7 +26,7 @@ services:
       - 9300:9300
 
   kibana:
-    container_name: kibana
+    container_name: researcher-searcher-kibana
     image: docker.elastic.co/kibana/kibana:7.4.0
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200

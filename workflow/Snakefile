@@ -2,7 +2,9 @@ import os
 import pandas as pd
 import yaml
 
-configfile: 'config/data.yaml'
+configfile: 'config/date.yaml'
+
+print(config['emails'])
 
 PERSON_DATA = 'workflow/results/person_data'
 PERSON_METADATA = 'workflow/results/person_metadata'
@@ -15,7 +17,7 @@ rule get_person:
     output: PERSON_DATA
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 10
+        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 1
         """
 
 rule get_person_data:

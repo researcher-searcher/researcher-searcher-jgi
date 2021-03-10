@@ -17,6 +17,7 @@ dependencies:
   - pyyaml
   - pip=20.2.4
   - beautifulsoup4
+  - elasticsearch
   - pip:
     - wget
     - snakemake>=5.27
