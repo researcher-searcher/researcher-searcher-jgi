@@ -104,7 +104,7 @@ def run_nlp(research_df):
 
             # create vectors
             #print(doc.vector)
-            vector_data.append({'url':df_row['url'],'sent':sent_num,'vector':list(sent.vector)})
+            vector_data.append({'url':df_row['url'],'sent_num':sent_num,'sent_text':sent.text,'vector':list(sent.vector)})
 
             # Analyze syntax
             noun_phrases=[]
