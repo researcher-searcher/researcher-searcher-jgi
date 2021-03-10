@@ -2,25 +2,11 @@ import scispacy
 import spacy
 import pandas as pd
 import os
-from scispacy.abbreviation import AbbreviationDetector
-from spacy import displacy
 from simple_parsing import ArgumentParser
 from loguru import logger
-from workflow.scripts.general import mark_as_complete
+from workflow.scripts.general import mark_as_complete, load_spacy_model
 
 parser = ArgumentParser()
-
-def load_model():
-    # Load English tokenizer, tagger, parser and NER
-    logger.info('Loading spacy model...')
-    #nlp = spacy.load("en_core_web_sm")
-    nlp = spacy.load("en_core_web_lg")
-    #nlp = spacy.load("en_core_sci_scibert")
-    #nlp = spacy.load("en_core_sci_lg")
-    #nlp = spacy.load("en_ner_bionlp13cg_md")
-    #nlp.add_pipe("abbreviation_detector")
-    logger.info('Done...')
-    return nlp
 
 #from spacy.tokens import Doc
 
@@ -83,7 +69,7 @@ def run_nlp(research_df):
         
     vector_data = []
 
-    nlp = load_model()
+    nlp = load_spacy_model()
     # do we need to filter stopwords?
     spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
     

@@ -27,10 +27,10 @@ def create_index(index_name,dim_size):
                     "enabled": "true"
                     },
                     "properties": {
-                    "doc-id": {
+                    "doc_id": {
                         "type": "keyword"
                     },
-                    "sent-id": {
+                    "sent_id": {
                         "type": "keyword"
                     },
                     "sent_text": {
@@ -81,17 +81,21 @@ def index_data(vector_data, index_name):
             )
             bulk_data = []
         # print(line.decode('utf-8'))
-        data_dict = {
-            "doc-id": rows['url'],
-            "sent-id": rows['sent_num'],
-            "sent_text": rows['sent_text'],
-            "sent_vector": rows['vector']
-        }
-        op_dict = {
-            "_index": index_name,
-            "_source": data_dict,
-        }
-        bulk_data.append(op_dict)
+        if np.count_nonzero(rows['vector'])==0:
+            logger.info(f"{rows['url']} {rows['sent_num']} returned empty vector so skipping")
+            continue
+        else:
+            data_dict = {
+                "doc_id": rows['url'],
+                "sent_num": rows['sent_num'],
+                "sent_text": rows['sent_text'],
+                "sent_vector": rows['vector']
+            }
+            op_dict = {
+                "_index": index_name,
+                "_source": data_dict,
+            }
+            bulk_data.append(op_dict)
     print(len(bulk_data))
     deque(
         helpers.streaming_bulk(
@@ -111,7 +115,7 @@ def index_data(vector_data, index_name):
         res = es.search(index=index_name, request_timeout=TIMEOUT)
         esRecords = res["hits"]["total"]
         print ("Number of records in index", index_name, "=", esRecords)
-    except timeout:
+    except TIMEOUT:
         print ("counting index timeout", index_name)
 
 
@@ -121,7 +125,7 @@ def query_record(index_name,query_vector,record_size=100000,search_size=1000,sco
             "query": {"match_all": {}},
             "script": {
                 #+1 to deal with negative results (script score function must not produce negative scores)
-                "source": "cosineSimilarity(params.query_vector, doc['text_vector']) +1",
+                "source": "cosineSimilarity(params.query_vector, doc['sent_vector']) +1",
                 "params": {"query_vector": query_vector}
             }
         }
@@ -132,15 +136,15 @@ def query_record(index_name,query_vector,record_size=100000,search_size=1000,sco
         body={
             "size": search_size,
             "query": script_query,
-            "_source": {"includes": ["name", "encode_text","full_text"]}
+            "_source": {"includes": ["doc_id", "sent_num", "sent_text"]}
         }
     )
-    #search_time = time.time() - search_start
-    #print()
-    #print("{} total hits.".format(response["hits"]["total"]["value"]))
-    #print("search time: {:.2f} ms".format(search_time * 1000))
+    search_time = time.time() - search_start
+    logger.info(f'Total hits {response["hits"]["total"]["value"]}')
+    logger.info(f"Search time: {search_time}")
     results=[]
     for hit in response["hits"]["hits"]:
+        #logger.debug(hit)
         #-1 to deal with +1 above
         #print("id: {}, score: {}".format(hit["_id"], hit["_score"] - 1))
         #print(hit["_source"])
@@ -148,9 +152,9 @@ def query_record(index_name,query_vector,record_size=100000,search_size=1000,sco
         #score cutoff
         if hit["_score"]-1>score_min:
             results.append({
-                'name':hit["_source"]['name'],
-                'score':hit["_score"]-1,
-                'encode_text':hit['_source']['encode_text'],
-                'full_text':hit['_source']['full_text']
+                'url':hit["_source"]['doc_id'],
+                'sent_num':hit['_source']['sent_num'],
+                'sent_text':hit['_source']['sent_text'],
+                'score':hit["_score"]-1
             })
-    return results
+    return results[0:10]
