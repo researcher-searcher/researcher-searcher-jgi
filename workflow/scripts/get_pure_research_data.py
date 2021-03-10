@@ -6,10 +6,11 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
 from loguru import logger
+from workflow.scripts.general import mark_as_complete
 
 parser = ArgumentParser()
-parser.add_argument("--file", type=str, help="File of research metadata")
-
+parser.add_argument("--input", type=str, help="Input file prefix")
+parser.add_argument("--output", type=str, help="Output file prefix")
 @dataclass
 class Options:
     """ Help string for this group of command-line arguments """
@@ -18,11 +19,9 @@ class Options:
 parser.add_arguments(Options, dest="options")
 
 args = parser.parse_args()
-logger.debug(args)
-logger.debug("options:", args.options.top)
 
 def read_file():
-    df = pd.read_csv(args.file,sep='\t')
+    df = pd.read_csv(f'{args.input}.tsv.gz',sep='\t')
     df.drop_duplicates(subset='url',inplace=True)
     logger.debug(df.head())
     return df
@@ -31,7 +30,7 @@ def create_research_data(df):
     data = []
     existing_data = []
     # check for existing data
-    f='workflow/results/research_data.tsv'
+    f=f'{args.output}.tsv.gz'
 
     if os.path.exists(f) and os.path.getsize(f) > 1:
         logger.info(f'Reading existing data {f}')
@@ -51,6 +50,7 @@ def create_research_data(df):
         else:
             d = {
                 'url':rows['url'],
+                'title':rows['title'],
                 'abstract':'NA',
             }
             abstract_data = get_research_data(rows['url'])
@@ -64,12 +64,8 @@ def create_research_data(df):
             data.append(d)
     #logger.debug(data)
     research_details = pd.DataFrame(data)
-    research_details.to_csv('workflow/results/research_data.tsv',sep='\t',index=False)
-    
-    # mark as completed and use this file for snakemake, can then rerun by removing this and keeping data
-    f = open('workflow/results/research_data.complete','w')
-    f.write('Done')
-    f.close()
+    research_details.to_csv(f,sep='\t',index=False)
+    mark_as_complete(args.output)
 
 def get_research_data(url):
     logger.debug(url)

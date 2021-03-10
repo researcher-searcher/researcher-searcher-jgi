@@ -5,10 +5,11 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
 from loguru import logger
+from workflow.scripts.general import mark_as_complete
 
 parser = ArgumentParser()
-parser.add_argument("--file", type=str, help="File of starting email addresses")
-
+parser.add_argument("--input", type=str, help="Input file prefix")
+parser.add_argument("--output", type=str, help="Output file prefix")
 @dataclass
 class Options:
     """ Help string for this group of command-line arguments """
@@ -19,7 +20,7 @@ parser.add_arguments(Options, dest="options")
 args = parser.parse_args()
 
 def read_file():
-    person_df = pd.read_csv(args.file,sep='\t')
+    person_df = pd.read_csv(f'{args.input}.tsv.gz',sep='\t')
     return person_df
 
 def create_research_data(person_df):
@@ -62,7 +63,8 @@ def create_research_data(person_df):
         data.append(d)
     logger.info(data)
     person_details = pd.DataFrame(data)
-    person_details.to_csv('workflow/results/person_data.tsv',sep='\t',index=False)
+    person_details.to_csv(f'{args.output}.tsv.gz',sep='\t',index=False)
+    mark_as_complete(args.output)
 
 def get_person_data(url):
     logger.debug(url)

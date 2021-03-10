@@ -6,10 +6,11 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
 from loguru import logger
+from workflow.scripts.general import mark_as_complete
 
 parser = ArgumentParser()
-parser.add_argument("--file", type=str, help="File of people")
-
+parser.add_argument("--input", type=str, help="Input file prefix")
+parser.add_argument("--output", type=str, help="Output file prefix")
 @dataclass
 class Options:
     """ Help string for this group of command-line arguments """
@@ -22,7 +23,7 @@ logger.debug(args)
 logger.debug("options:", args.options.top)
 
 def read_file():
-    person_df = pd.read_csv(args.file,sep='\t')
+    person_df = pd.read_csv(f'{args.input}.tsv.gz',sep='\t')
     logger.debug(person_df.head())
     return person_df
 
@@ -30,7 +31,7 @@ def create_research_data(person_df):
     data = []
     existing_data = []
     # check for existing data
-    f='workflow/results/research_meta_data.tsv'
+    f=f'{args.output}.tsv.gz'
 
     if os.path.exists(f) and os.path.getsize(f) > 1:
         logger.info(f'Reading existing data {f}')
@@ -56,11 +57,8 @@ def create_research_data(person_df):
     #logger.debug(d)
     research_df = pd.DataFrame(data)
     research_df.to_csv(f,sep='\t',index=False)
+    mark_as_complete(args.output)
 
-    # mark as completed and use this file for snakemake, can then rerun by removing this and keeping data
-    f = open('workflow/results/research_metadata.complete','w')
-    f.write('Done')
-    f.close()
 
 def get_research_output(url):
     logger.debug(url)

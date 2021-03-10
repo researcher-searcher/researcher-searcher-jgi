@@ -4,36 +4,50 @@ import yaml
 
 configfile: 'config/data.yaml'
 
+PERSON_DATA = 'workflow/results/person_data'
+PERSON_METADATA = 'workflow/results/person_metadata'
+RESEARCH_DATA = 'workflow/results/research_data'
+RESEARCH_METADATA = 'workflow/results/research_metadata'
+TEXT_DATA = 'workflow/results/text_data'
+
 rule get_person:
-    input: config['emails'][0]
-    output: os.path.join('workflow/results/person_pages.tsv')
+    input: config['emails']
+    output: PERSON_DATA
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --file {input} --top 20
+        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 2
         """
 
 rule get_person_data:
-    input: os.path.join('workflow/results/person_pages.tsv')
-    output: os.path.join('workflow/results/person_data.tsv')
+    input: PERSON_DATA
+    output: PERSON_METADATA
     shell: 
         """
-        python -m workflow.scripts.get_pure_person_data --file {input}
+        python -m workflow.scripts.get_pure_person_data --input {input} --output {output}
         """
 
 rule get_research_output:
-    input: os.path.join('workflow/results/person_data.tsv')
-    output: os.path.join('workflow/results/research_metadata.complete')
+    input: PERSON_DATA
+    output: RESEARCH_METADATA
     shell:
         """
-        python -m workflow.scripts.get_pure_research_metadata --file workflow/results/person_pages.tsv
+        python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output}
         """
 
 rule get_research_details:
-    input: os.path.join('workflow/results/research_metadata.complete')
-    output: os.path.join('workflow/results/research_data.complete')
+    input: RESEARCH_METADATA
+    output: RESEARCH_DATA
     shell:
         """
-        python -m workflow.scripts.get_pure_research_data --file {input}
+        python -m workflow.scripts.get_pure_research_data --input {input} --output {output}
+        """
+
+rule parse_text:
+    input: RESEARCH_DATA
+    output: TEXT_DATA
+    shell:
+        """
+        python -m workflow.scripts.run_spacy --input {input} --output {output}
         """
 
 rule clean_for_build:
@@ -41,4 +55,6 @@ rule clean_for_build:
         """
         echo 'Deleting: workflow/results/*.complete'
         rm -f rm workflow/results/*.complete
+        #echo 'Deleting: workflow/results/person*'
+        #rm -f rm workflow/results/person*
         """

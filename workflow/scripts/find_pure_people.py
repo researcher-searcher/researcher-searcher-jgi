@@ -5,9 +5,11 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
 from loguru import logger
+from workflow.scripts.general import mark_as_complete
 
 parser = ArgumentParser()
-parser.add_argument("--file", type=str, help="List of email addresses")
+parser.add_argument("--input", type=str, help="Input file prefix")
+parser.add_argument("--output", type=str, help="Output file prefix")
 
 @dataclass
 class Options:
@@ -21,7 +23,7 @@ logger.debug(args)
 logger.debug("options:", args.options.top)
 
 def read_emails():
-    df = pd.read_csv(args.file,names=['email'])
+    df = pd.read_csv(args.input,names=['email'])
     logger.debug(df.head())
 
     # check for dups
@@ -78,7 +80,8 @@ def get_all_people(email_df):
     person_df = pd.DataFrame(person_data)
     email_df = pd.merge(email_df,person_df,left_on='email',right_on='email')
     logger.debug(email_df.head())
-    email_df.to_csv('workflow/results/person_pages.tsv',sep='\t',index=False)
+    email_df.to_csv(f'{args.output}.tsv.gz',sep='\t',index=False)
+    mark_as_complete(args.output)
 
 email_df = read_emails()
 get_all_people(email_df)
