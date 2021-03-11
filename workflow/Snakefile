@@ -20,7 +20,7 @@ rule find_person:
     output: PERSON_DATA
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 200
+        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 1000
         """
 
 rule get_person_data:
@@ -67,5 +67,5 @@ rule clean_for_build:
     shell:
         """
         echo 'Deleting files'
-        rm -f {PERSON_DATA} {PERSON_METADATA} {RESEARCH_DATA} {RESEARCH_METADATA} {TEXT_DATA}
+        rm -f {PERSON_DATA} {PERSON_METADATA} {RESEARCH_DATA} {RESEARCH_METADATA} {TEXT_DATA} {INDEX_DATA}
         """

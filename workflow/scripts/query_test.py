@@ -13,6 +13,11 @@ def query_vector_data():
         "infections and immunity. There is no limit to the funding you can request. This "
         "funding opportunity runs three times every year."
     )
+    test_text = (
+        "Funding is available from MRC’s Neurosciences and Mental Health Board to support new partnerships between "
+        "researchers in the area of neurosciences and mental health. Funding varies widely for partnerships lasting "
+        "between one and five years. This funding opportunity runs three times every year."
+    )
     doc = nlp(test_text)
     for sent in doc.sents:
         logger.info(sent)
@@ -23,9 +28,10 @@ def query_vector_data():
         if res:
             for r in res:
                 if r["score"] > 0.5:
-                    logger.info(r)
+                    logger.info(f'full sent {r}')
 
         # noun chunks
+        noun_chunk_string = ""
         for chunk in sent.noun_chunks:
             # for token in chunk:
             #    logger.info(token.lemma_)
@@ -36,8 +42,18 @@ def query_vector_data():
                 == True
             ):
                 # not sure if should filter on number of words in chunk?
-                # if len(chunk) > 1:
-                logger.info(f"noun chunk: {chunk} {len(chunk)}")
+                # might work better here to avoid ambiguous single words, e.g. funding, background...
+                if len(chunk) > 1:
+                    logger.info(f"noun chunk: {chunk} {len(chunk)}")
+                    noun_chunk_string+=str(chunk)+' '
+        logger.info(noun_chunk_string)
+        if noun_chunk_string != '':
+            chunk_vec = nlp(noun_chunk_string).vector
+            res = query_record(index_name=vector_index_name, query_vector=chunk_vec)
+            if res:
+                for r in res:
+                    if r["score"] > 0.5:
+                        logger.info(f'chunk {r}')
     # return res
 
 
