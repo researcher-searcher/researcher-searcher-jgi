@@ -93,16 +93,13 @@ def run_nlp(research_df):
             vector_data.append({'url':df_row['url'],'sent_num':sent_num,'sent_text':sent.text,'vector':list(sent.vector)})
 
             # Analyze syntax
-            noun_phrases=[]
             for chunk in sent.noun_chunks:
                 #logger.debug(chunk)
                 #remove stopwords and things
                 if all(token.is_stop != True and token.is_punct != True and '-PRON-' not in token.lemma_ for token in chunk) == True:
                     # not sure if should filter on number of words in chunk?
-                    if len(chunk) > 1:
-                        noun_phrases.append(chunk)
-                        outdata.append({'url':df_row['url'],'sent':sent_num,'noun_phrase':chunk})
-            #logger.info(f"Noun phrases: {noun_phrases}")
+                    #if len(chunk) > 1:
+                    outdata.append({'url':df_row['url'],'sent':sent_num,'noun_phrase':chunk})
             logger.info(f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}")
             #logger.debug(f"All: {[token.lemma_ for token in doc]}")
 

@@ -12,12 +12,12 @@ RESEARCH_DATA = 'workflow/results/research_data'
 RESEARCH_METADATA = 'workflow/results/research_metadata'
 TEXT_DATA = 'workflow/results/text_data'
 
-rule get_person:
+rule find_person:
     input: config['emails']
     output: PERSON_DATA
     shell: 
         """
-        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 100
+        python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 200
         """
 
 rule get_person_data:
@@ -55,8 +55,6 @@ rule parse_text:
 rule clean_for_build:
     shell:
         """
-        echo 'Deleting: workflow/results/*.complete'
-        rm -f rm workflow/results/*.complete
-        #echo 'Deleting: workflow/results/person*'
-        #rm -f rm workflow/results/person*
+        echo 'Deleting files'
+        rm -f {PERSON_DATA} {PERSON_METADATA} {RESEARCH_DATA} {RESEARCH_METADATA} {TEXT_DATA}
         """

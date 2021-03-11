@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import requests
+import os
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from simple_parsing import ArgumentParser
@@ -73,14 +74,32 @@ def uob_finder_web(email):
     return person_info
 
 def get_all_people(email_df):
-    person_data = []
+    data = []
+    # check for existing data
+    f=f'{args.output}.tsv.gz'
+    existing_data = []
+    if os.path.exists(f) and os.path.getsize(f) > 1:
+        logger.info(f'Reading existing data {f}')
+        existing_df = pd.read_csv(f,sep='\t')
+        #print(existing_df)
+        existing_data = list(existing_df['email'])
+        #logger.debug(existing_data)
+        try:
+            data = existing_df.to_dict('records')
+        except:
+            logger.warning(f'Error when reading {f}')
+        logger.debug(f'Got data on {len(existing_data)} urls')
+
     for i,row in email_df.iterrows():
-        person_info = uob_finder_web(email=row['email'])
-        person_data.append(person_info)
-    person_df = pd.DataFrame(person_data)
+        if row['email'] in existing_data:
+            logger.info(f"{row['email']} done")
+        else:
+            person_info = uob_finder_web(email=row['email'])
+            data.append(person_info)
+    person_df = pd.DataFrame(data)
     email_df = pd.merge(email_df,person_df,left_on='email',right_on='email')
     logger.debug(email_df.head())
-    email_df.to_csv(f'{args.output}.tsv.gz',sep='\t',index=False)
+    email_df.to_csv(f,sep='\t',index=False)
     mark_as_complete(args.output)
 
 email_df = read_emails()
