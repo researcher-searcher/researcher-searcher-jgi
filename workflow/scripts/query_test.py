@@ -7,18 +7,22 @@ vector_index_name = "sentence_vectors"
 
 def query_vector_data():
     nlp = load_spacy_model()
-    test_text = (
+    test_text1 = (
         "Funding is available from MRC’s Infections and Immunity Board to provide large, "
         "long-term and renewable programme funding for researchers working in the area of "
         "infections and immunity. There is no limit to the funding you can request. This "
         "funding opportunity runs three times every year."
     )
-    test_text = (
+    test_text2 = (
         "Funding is available from MRC’s Neurosciences and Mental Health Board to support new partnerships between "
         "researchers in the area of neurosciences and mental health. Funding varies widely for partnerships lasting "
         "between one and five years. This funding opportunity runs three times every year."
     )
-    doc = nlp(test_text)
+    test_text3 = (
+        "We have implemented efficient search methods and an application programming interface, to create fast and convenient"
+        " functions to utilize triples extracted from the biomedical literature by SemMedDB."
+    )
+    doc = nlp(test_text3)
     for sent in doc.sents:
         logger.info(sent)
 

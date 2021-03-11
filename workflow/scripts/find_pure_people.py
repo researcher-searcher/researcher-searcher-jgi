@@ -29,10 +29,13 @@ logger.debug("options:", args.options.top)
 
 def read_emails():
     df = pd.read_csv(args.input, names=["email"])
-    logger.debug(df.head())
-
+    #make lowercase
+    df['email'] = df['email'].str.lower()
+    logger.info(df.shape)
     # check for dups
     df.drop_duplicates(inplace=True)
+    logger.debug(df.head())
+    logger.info(df.shape)
 
     pattern = re.compile(r"(^[a-zA-Z0-9_.+-]+@bristol.ac.uk$)")
     email_check = df["email"].apply(lambda x: True if pattern.match(x) else False)
