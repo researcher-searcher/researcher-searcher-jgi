@@ -79,7 +79,7 @@ def index_vector_data(df, index_name):
         # with gzip.open(sentence_data) as f:
         # next(f)
         counter += 1
-        if counter % 100 == 0:
+        if counter % 1000 == 0:
             end = time.time()
             t = round((end - start), 4)
             print(len(bulk_data), t, counter)

@@ -65,8 +65,8 @@ def create_texts():
             textList.append(rows["title"])
     research_df["text"] = textList
     #logger.debug(research_df.head())
-    logger.info(f'Found {existing_noun_df.shape[0]} noun entries')
-    logger.info(f'Found {existing_vector_df.shape[0]} vector entries')
+    logger.info(f'Found {len(noun_data)} noun entries')
+    logger.info(f'Found {len(vector_data)} vector entries')
     logger.info(f'Parsing data from {research_df.shape[0]} records')
     return research_df, noun_data, vector_data
 
@@ -89,7 +89,7 @@ def run_nlp(research_df, noun_data, vector_data):
         doc = docs[i]
         #logger.info(doc)
         df_row = research_df.iloc[i]
-        if i % 100 == 0:
+        if i % 1000 == 0:
             logger.info(f"{i} {len(docs)}")
 
         # logger.info(tokens)
@@ -123,9 +123,12 @@ def run_nlp(research_df, noun_data, vector_data):
                 ):
                     # not sure if should filter on number of words in chunk?
                     # if len(chunk) > 1:
-                    noun_data.append(
-                        {"url": df_row["url"], "sent_num": sent_num, "noun_phrase": chunk}
-                    )
+                    
+                    # null string values cause problems with ES
+                    if str(chunk) != 'null':
+                        noun_data.append(
+                            {"url": df_row["url"], "sent_num": sent_num, "noun_phrase": chunk}
+                        )
             #logger.info(
             #    f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
             #)
