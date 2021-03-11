@@ -6,11 +6,14 @@ configfile: 'config/date.yaml'
 
 print(config['emails'])
 
-PERSON_DATA = 'workflow/results/person_data'
-PERSON_METADATA = 'workflow/results/person_metadata'
-RESEARCH_DATA = 'workflow/results/research_data'
-RESEARCH_METADATA = 'workflow/results/research_metadata'
-TEXT_DATA = 'workflow/results/text_data'
+OUTDIR='workflow/results/
+
+PERSON_DATA = f'{OUTDIR}person_data'
+PERSON_METADATA = f'{OUTDIR}person_metadata'
+RESEARCH_DATA = f'{OUTDIR}research_data'
+RESEARCH_METADATA = f'{OUTDIR}research_metadata'
+TEXT_DATA = f'{OUTDIR}text_data'
+INDEX_DATA = f'{OUTDIR}index_data'
 
 rule find_person:
     input: config['emails']
@@ -50,6 +53,14 @@ rule parse_text:
     shell:
         """
         python -m workflow.scripts.run_spacy --input {input} --output {output}
+        """
+
+rule index_data:
+    input: TEXT_DATA
+    output: INDEX_DATA
+    shell:
+        """
+        python -m workflow.scripts.index_data --input {input} --output {output}
         """
 
 rule clean_for_build:
