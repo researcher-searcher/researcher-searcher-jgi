@@ -68,6 +68,7 @@ def create_texts():
     logger.info(f'Found {len(noun_data)} noun entries')
     logger.info(f'Found {len(vector_data)} vector entries')
     logger.info(f'Parsing data from {research_df.shape[0]} records')
+    #research_df=research_df[research_df['url']=='https://research-information.bris.ac.uk/en/publications/long-time-scale-gpu-dynamics-reveal-the-mechanism-of-drug-resista']
     return research_df, noun_data, vector_data
 
 
@@ -123,9 +124,9 @@ def run_nlp(research_df, noun_data, vector_data):
                 ):
                     # not sure if should filter on number of words in chunk?
                     # if len(chunk) > 1:
-                    
-                    # null string values cause problems with ES
-                    if str(chunk) != 'null':
+
+                    # null string values cause problems with ES, also no need to keep anything less than 3 characters
+                    if str(chunk) != 'null' and len(str(chunk))>2:
                         noun_data.append(
                             {"url": df_row["url"], "sent_num": sent_num, "noun_phrase": chunk}
                         )
