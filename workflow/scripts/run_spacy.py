@@ -16,9 +16,8 @@ parser.add_argument("--input", type=str, help="Input file prefix")
 parser.add_argument("--output", type=str, help="Output file prefix")
 args = parser.parse_args()
 
-outfile = f"{args.output}_vectors.pkl.gz"
-outdata = []
-
+vector_outfile = f"{args.output}_vectors.pkl.gz"
+noun_outfile = f"{args.output}_noun_chunks.tsv.gz"
 
 def create_single_text(row):
     text = row["title"]
@@ -30,26 +29,31 @@ def create_single_text(row):
 def create_texts():
     # Process whole documents
     research_df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
-    existing_data = []
+    vector_data = []
+    noun_data = []  
+    existing_vector_data = []
     # check for existing
-    if os.path.exists(outfile) and os.path.getsize(outfile) > 1:
-        logger.info(f"Reading existing data {outfile}")
-        existing_df = pd.read_pickle(outfile)
-        if not existing_df.empty:
+    if os.path.exists(vector_outfile) and os.path.getsize(vector_outfile) > 1:
+        logger.info(f"Reading existing data {vector_outfile}")
+        existing_vector_df = pd.read_pickle(vector_outfile)
+        if not existing_vector_df.empty:
             # print(existing_df)
-            existing_data = list(existing_df["url"].unique())
+            existing_vector_data = list(existing_vector_df["url"].unique())
             # remove matches
             logger.debug(research_df.shape)
-            research_df = research_df[~research_df["url"].isin(existing_data)]
+            research_df = research_df[~research_df["url"].isin(existing_vector_data)]
             logger.debug(research_df.shape)
             # logger.debug(existing_data)
             try:
-                outdata = existing_df.to_dict("records")
+                vector_data = existing_vector_df.to_dict("records")
+                existing_noun_df = pd.read_csv(noun_outfile,sep='\t')
+                logger.info(existing_noun_df.shape)
+                noun_data = existing_noun_df.to_dict("records")
             except:
-                logger.warning(f"Error when reading {outfile}")
-            logger.debug(f"Got data on {len(existing_data)} urls")
+                logger.warning(f"Error when reading {vector_outfile}")
+            logger.debug(f"Got data on {len(existing_vector_data)} urls")
         else:
-            logger.debug(f"Existing {outfile} is empty")
+            logger.debug(f"Existing {vector_outfile} is empty")
 
     # create single string of text
     # maybe just leave titles and abstract separate if treating each sentence separately
@@ -60,17 +64,18 @@ def create_texts():
         else:
             textList.append(rows["title"])
     research_df["text"] = textList
-    logger.debug(research_df.head())
-    return research_df
+    #logger.debug(research_df.head())
+    logger.info(f'Found {existing_noun_df.shape[0]} noun entries')
+    logger.info(f'Found {existing_vector_df.shape[0]} vector entries')
+    logger.info(f'Parsing data from {research_df.shape[0]} records')
+    return research_df, noun_data, vector_data
 
 
-def run_nlp(research_df):
+def run_nlp(research_df, noun_data, vector_data):
     if research_df.empty:
         logger.info("No new data")
         mark_as_complete(args.output)
         exit()
-
-    vector_data = []
 
     nlp = load_spacy_model()
     # do we need to filter stopwords?
@@ -79,17 +84,19 @@ def run_nlp(research_df):
     text = list(research_df["text"])
     docs = list(nlp.pipe(text))
 
+    logger.info(f'Create {len(docs)} NLP objects')
     for i in range(0, len(docs)):
         doc = docs[i]
-        logger.info(doc)
+        #logger.info(doc)
         df_row = research_df.iloc[i]
-        logger.info(f"{i} {len(docs)}")
+        if i % 100 == 0:
+            logger.info(f"{i} {len(docs)}")
 
         # logger.info(tokens)
         assert doc.has_annotation("SENT_START")
         sent_num = 0
         for sent in doc.sents:
-            logger.info(sent.text)
+            #logger.info(sent.text)
 
             # create vectors
             # print(doc.vector)
@@ -116,36 +123,33 @@ def run_nlp(research_df):
                 ):
                     # not sure if should filter on number of words in chunk?
                     # if len(chunk) > 1:
-                    outdata.append(
+                    noun_data.append(
                         {"url": df_row["url"], "sent_num": sent_num, "noun_phrase": chunk}
                     )
-            logger.info(
-                f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
-            )
+            #logger.info(
+            #    f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
+            #)
             # logger.debug(f"All: {[token.lemma_ for token in doc]}")
 
             # Find named entities, phrases and concepts - can use
-            for entity in sent.ents:
-                logger.debug(
-                    f"entity: {entity} #entity.text: {entity.text} entity.label_:{entity.label_}"
-                )
+            #for entity in sent.ents:
+            #    logger.debug(
+            #    )
+            #        f"entity: {entity} #entity.text: {entity.text} entity.label_:{entity.label_}"
             sent_num += 1
 
     # logger.info(data)
-    df = pd.DataFrame(outdata)
+    df = pd.DataFrame(noun_data)
     df.dropna(inplace=True)
-    df.to_csv(f"{args.output}_noun_chunks.tsv.gz", sep="\t", index=False)
+    df.to_csv(noun_outfile, sep="\t", index=False)
 
     df = pd.DataFrame(vector_data)
     df.dropna(inplace=True)
     logger.info(df.head())
-    df.to_pickle(outfile)
+    df.to_pickle(vector_outfile)
 
     mark_as_complete(args.output)
 
-    # unpickled_df = pd.read_pickle('workflow/results/sentence_spacy_vector.pkl.gz')
-    # logger.info(unpickled_df.head())
-
-
-research_df = create_texts()
-run_nlp(research_df)
+if __name__ == "__main__":
+    research_df, noun_data, vector_data = create_texts()
+    run_nlp(research_df, noun_data, vector_data)

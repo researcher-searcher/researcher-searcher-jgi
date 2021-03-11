@@ -108,6 +108,6 @@ def get_person_data(url):
         person_data = orcid_data = "NA"
     return person_data, orcid_data
 
-
-person_df = read_file()
-create_research_data(person_df)
+if __name__ == "__main__":
+    person_df = read_file()
+    create_research_data(person_df)

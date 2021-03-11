@@ -84,6 +84,6 @@ def get_research_data(url):
     )
     return abstract_data
 
-
-df = read_file()
-create_research_data(df)
+if __name__ == "__main__":
+    df = read_file()
+    create_research_data(df)

@@ -110,6 +110,6 @@ def get_all_people(email_df):
     email_df.to_csv(f, sep="\t", index=False)
     mark_as_complete(args.output)
 
-
-email_df = read_emails()
-get_all_people(email_df)
+if __name__ == "__main__":
+    email_df = read_emails()
+    get_all_people(email_df)

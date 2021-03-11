@@ -82,6 +82,6 @@ def get_research_output(url):
     # logger.debug(research_output)
     return research_output
 
-
-person_df = read_file()
-create_research_data(person_df)
+if __name__ == "__main__":
+    person_df = read_file()
+    create_research_data(person_df)

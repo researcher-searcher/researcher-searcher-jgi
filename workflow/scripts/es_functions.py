@@ -8,6 +8,7 @@ import pandas as pd
 
 
 TIMEOUT = 300
+chunkSize = 10000
 es = Elasticsearch(["localhost:9200"], timeout=TIMEOUT)
 
 
@@ -73,7 +74,6 @@ def index_vector_data(df, index_name):
     bulk_data = []
     counter = 1
     start = time.time()
-    chunkSize = 1000
 
     for i, rows in df.iterrows():
         # with gzip.open(sentence_data) as f:
@@ -141,13 +141,12 @@ def index_noun_data(df, index_name):
     bulk_data = []
     counter = 1
     start = time.time()
-    chunkSize = 1000
 
     for i, rows in df.iterrows():
         # with gzip.open(sentence_data) as f:
         # next(f)
         counter += 1
-        if counter % 100 == 0:
+        if counter % 1000 == 0:
             end = time.time()
             t = round((end - start), 4)
             print(len(bulk_data), t, counter)

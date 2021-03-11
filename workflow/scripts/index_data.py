@@ -12,10 +12,6 @@ from workflow.scripts.es_functions import (
 
 parser = ArgumentParser()
 
-# from spacy.tokens import Doc
-
-# Doc.set_extension("url", default=None)
-
 parser.add_argument("--input", type=str, help="Input file prefix")
 parser.add_argument("--output", type=str, help="Output file prefix")
 args = parser.parse_args()
@@ -30,15 +26,16 @@ def index_vectors():
         df=df, index_name=vector_index_name
     )
 
-
 def index_nouns():
     noun_index_name = "sentence_nouns"
     delete_index(noun_index_name)
     create_noun_index(index_name=noun_index_name, dim_size=300)
     df = pd.read_csv(f'{args.input}_noun_chunks.tsv.gz',sep='\t')
-    index_noun_data(df=df,index_name=noun_index_name)
+    index_noun_data(
+        df=df,index_name=noun_index_name
+    )
 
-
-index_vectors()
-index_nouns()
-# mark_as_complete(args.output)
+if __name__ == "__main__":
+    index_vectors()
+    index_nouns()
+    mark_as_complete(args.output)
