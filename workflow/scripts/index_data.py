@@ -32,13 +32,13 @@ def index_vectors():
 
 
 def index_nouns():
-    noun_index_name = "nouns"
+    noun_index_name = "sentence_nouns"
     delete_index(noun_index_name)
     create_noun_index(index_name=noun_index_name, dim_size=300)
     df = pd.read_csv(f'{args.input}_noun_chunks.tsv.gz',sep='\t')
     index_noun_data(df=df,index_name=noun_index_name)
 
 
-# index_vectors()
+index_vectors()
 index_nouns()
 # mark_as_complete(args.output)

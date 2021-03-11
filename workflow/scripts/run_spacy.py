@@ -110,7 +110,6 @@ def run_nlp(research_df):
                     all(
                         token.is_stop != True
                         and token.is_punct != True
-                        and "-PRON-" not in token.lemma_
                         for token in chunk
                     )
                     == True
@@ -134,10 +133,11 @@ def run_nlp(research_df):
 
     # logger.info(data)
     df = pd.DataFrame(outdata)
-    logger.info(df.head())
+    df.dropna(inplace=True)
     df.to_csv(f"{args.output}_noun_chunks.tsv.gz", sep="\t", index=False)
 
     df = pd.DataFrame(vector_data)
+    df.dropna(inplace=True)
     logger.info(df.head())
     df.to_pickle(outfile)
 
