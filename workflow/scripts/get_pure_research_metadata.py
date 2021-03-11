@@ -11,10 +11,14 @@ from workflow.scripts.general import mark_as_complete
 parser = ArgumentParser()
 parser.add_argument("--input", type=str, help="Input file prefix")
 parser.add_argument("--output", type=str, help="Output file prefix")
+
+
 @dataclass
 class Options:
     """ Help string for this group of command-line arguments """
-    top: int = -1 # How many to read
+
+    top: int = -1  # How many to read
+
 
 parser.add_arguments(Options, dest="options")
 
@@ -22,57 +26,62 @@ args = parser.parse_args()
 logger.debug(args)
 logger.debug("options:", args.options.top)
 
+
 def read_file():
-    person_df = pd.read_csv(f'{args.input}.tsv.gz',sep='\t')
+    person_df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
     logger.debug(person_df.head())
     return person_df
+
 
 def create_research_data(person_df):
     data = []
     existing_data = []
     # check for existing data
-    f=f'{args.output}.tsv.gz'
+    f = f"{args.output}.tsv.gz"
 
     if os.path.exists(f) and os.path.getsize(f) > 1:
-        logger.info(f'Reading existing data {f}')
-        existing_df = pd.read_csv(f,sep='\t')
-        #print(existing_df)
-        existing_data = list(existing_df['email'].unique())
-        #logger.debug(existing_data)
+        logger.info(f"Reading existing data {f}")
+        existing_df = pd.read_csv(f, sep="\t")
+        # print(existing_df)
+        existing_data = list(existing_df["email"].unique())
+        # logger.debug(existing_data)
         try:
-            data = existing_df.to_dict('records')
+            data = existing_df.to_dict("records")
         except:
-            logger.warning(f'Error when reading {f}')
-        logger.debug(f'Got data on {len(existing_data)} emails')
+            logger.warning(f"Error when reading {f}")
+        logger.debug(f"Got data on {len(existing_data)} emails")
 
-    for i,rows in person_df.iterrows():
-        if rows['email'] in existing_data:
+    for i, rows in person_df.iterrows():
+        if rows["email"] in existing_data:
             logger.debug(f"{rows['email']} already done")
         else:
-            research_output = get_research_output(rows['page'])
-        #research_output = get_research_output('https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth')
+            research_output = get_research_output(rows["page"])
+            # research_output = get_research_output('https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth')
             for r in research_output:
-            #logger.debug(i)
-                data.append({'email':rows['email'],'url':r['href'],'title':r.getText()})
-    #logger.debug(d)
+                # logger.debug(i)
+                data.append(
+                    {"email": rows["email"], "url": r["href"], "title": r.getText()}
+                )
+    # logger.debug(d)
     research_df = pd.DataFrame(data)
-    research_df.to_csv(f,sep='\t',index=False)
+    research_df.to_csv(f, sep="\t", index=False)
     mark_as_complete(args.output)
 
 
 def get_research_output(url):
     logger.debug(url)
     try:
-        research_url = f'{url}/publications'
+        research_url = f"{url}/publications"
         res = requests.get(research_url)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        #<a rel="ContributionToJournal" href="https://research-information.bris.ac.uk/en/publications/coffee-consumption-and-risk-of-breast-cancer-a-mendelian-randomiz" class="link"><span>Coffee consumption and risk of breast cancer: a Mendelian Randomization study </span></a>
+        soup = BeautifulSoup(res.text, "html.parser")
+        # <a rel="ContributionToJournal" href="https://research-information.bris.ac.uk/en/publications/coffee-consumption-and-risk-of-breast-cancer-a-mendelian-randomiz" class="link"><span>Coffee consumption and risk of breast cancer: a Mendelian Randomization study </span></a>
         research_output = soup.find_all("a", class_="link", rel="ContributionToJournal")
     except:
-        logger.warning('get_research_output failed')
+        logger.warning("get_research_output failed")
         research_output = []
-    #logger.debug(research_output)
+    # logger.debug(research_output)
     return research_output
+
 
 person_df = read_file()
 create_research_data(person_df)
