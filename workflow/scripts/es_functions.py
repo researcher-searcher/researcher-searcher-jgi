@@ -204,7 +204,7 @@ def delete_index(index_name):
 
 
 def vector_query(
-    index_name, query_vector, record_size=100000, search_size=1000, score_min=0
+    index_name, query_vector, record_size=100000, search_size=100, score_min=0
 ):
     script_query = {
         "script_score": {
@@ -246,7 +246,7 @@ def vector_query(
                         "score": hit["_score"] - 1,
                     }
                 )
-        return results[0:10]
+        return results
     except:
         return []
 

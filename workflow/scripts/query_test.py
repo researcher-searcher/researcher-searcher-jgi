@@ -1,26 +1,53 @@
+import json
+import pprint
 from loguru import logger
 from workflow.scripts.es_functions import vector_query, standard_query
 from workflow.scripts.general import load_spacy_model
 
 vector_index_name = "sentence_vectors"
+pp = pprint.PrettyPrinter(indent=4)
 
+test_text1 = (
+    "Funding is available from MRC’s Infections and Immunity Board to provide large, "
+    "long-term and renewable programme funding for researchers working in the area of "
+    "infections and immunity. There is no limit to the funding you can request. This "
+    "funding opportunity runs three times every year."
+)
+test_text2 = (
+    "Funding is available from MRC’s Neurosciences and Mental Health Board to support new partnerships between "
+    "researchers in the area of neurosciences and mental health. Funding varies widely for partnerships lasting "
+    "between one and five years. This funding opportunity runs three times every year."
+)
+test_text3 = (
+    "We have implemented efficient search methods and an application programming interface, to create fast and convenient"
+    " functions to utilize triples extracted from the biomedical literature by SemMedDB."
+)
+test_text4 = (
+    "Ankyrin-R provides a key link between band 3 and the spectrin cytoskeleton that helps to maintain the highly "
+    "specialised erythrocyte biconcave shape. Ankyrin deficiency results in fragile spherocytic erythrocytes with "
+    "reduced band 3 and protein 4.2 expression. We use in vitro differentiation of erythroblasts transduced with shRNAs "
+    "targeting the ANK1 gene to generate erythroblasts and reticulocytes with a novel ankyrin-R ‘near null’ human "
+    "phenotype with less than 5% of normal ankyrin expression. Using this model we demonstrate that absence of ankyrin "
+    "negatively impacts the reticulocyte expression of a variety of proteins including band 3, glycophorin A, spectrin, "
+    "adducin and more strikingly protein 4.2, CD44, CD47 and Rh/RhAG. Loss of band 3, which fails to form tetrameric "
+    "complexes in the absence of ankyrin, alongside GPA, occurs due to reduced retention within the reticulocyte membrane "
+    "during erythroblast enucleation. However, loss of RhAG is temporally and mechanistically distinct, occurring "
+    "predominantly as a result of instability at the plasma membrane and lysosomal degradation prior to enucleation. "
+    "Loss of Rh/RhAG was identified as common to erythrocytes with naturally occurring ankyrin deficiency and "
+    "demonstrated to occur prior to enucleation in cultures of erythroblasts from a hereditary spherocytosis patient "
+    "with severe ankyrin deficiency but not in those exhibiting milder reductions in expression. The identification of "
+    "prominently reduced surface expression of Rh/RhAG in combination with direct evaluation of ankyrin expression using "
+    "flow cytometry provides an efficient and rapid approach for the categorisation of hereditary spherocytosis arising "
+    "from ankyrin deficiency."
+)
+test_text5 = (
+    "Risk factors for breast cancer"
+)
+
+# create vectof of each string
 def q1():
     nlp = load_spacy_model()
-    test_text1 = (
-        "Funding is available from MRC’s Infections and Immunity Board to provide large, "
-        "long-term and renewable programme funding for researchers working in the area of "
-        "infections and immunity. There is no limit to the funding you can request. This "
-        "funding opportunity runs three times every year."
-    )
-    test_text2 = (
-        "Funding is available from MRC’s Neurosciences and Mental Health Board to support new partnerships between "
-        "researchers in the area of neurosciences and mental health. Funding varies widely for partnerships lasting "
-        "between one and five years. This funding opportunity runs three times every year."
-    )
-    test_text3 = (
-        "We have implemented efficient search methods and an application programming interface, to create fast and convenient"
-        " functions to utilize triples extracted from the biomedical literature by SemMedDB."
-    )
+
     doc = nlp(test_text3)
     for sent in doc.sents:
         logger.info(sent)
@@ -58,39 +85,20 @@ def q1():
                     if r["score"] > 0.5:
                         logger.info(f'chunk {r}')
 
+# use whole doc as vector
 def q2():
     nlp = load_spacy_model()
-    test_text4 = (
-        "Ankyrin-R provides a key link between band 3 and the spectrin cytoskeleton that helps to maintain the highly "
-        "specialised erythrocyte biconcave shape. Ankyrin deficiency results in fragile spherocytic erythrocytes with "
-        "reduced band 3 and protein 4.2 expression. We use in vitro differentiation of erythroblasts transduced with shRNAs "
-        "targeting the ANK1 gene to generate erythroblasts and reticulocytes with a novel ankyrin-R ‘near null’ human "
-        "phenotype with less than 5% of normal ankyrin expression. Using this model we demonstrate that absence of ankyrin "
-        "negatively impacts the reticulocyte expression of a variety of proteins including band 3, glycophorin A, spectrin, "
-        "adducin and more strikingly protein 4.2, CD44, CD47 and Rh/RhAG. Loss of band 3, which fails to form tetrameric "
-        "complexes in the absence of ankyrin, alongside GPA, occurs due to reduced retention within the reticulocyte membrane "
-        "during erythroblast enucleation. However, loss of RhAG is temporally and mechanistically distinct, occurring "
-        "predominantly as a result of instability at the plasma membrane and lysosomal degradation prior to enucleation. "
-        "Loss of Rh/RhAG was identified as common to erythrocytes with naturally occurring ankyrin deficiency and "
-        "demonstrated to occur prior to enucleation in cultures of erythroblasts from a hereditary spherocytosis patient "
-        "with severe ankyrin deficiency but not in those exhibiting milder reductions in expression. The identification of "
-        "prominently reduced surface expression of Rh/RhAG in combination with direct evaluation of ankyrin expression using "
-        "flow cytometry provides an efficient and rapid approach for the categorisation of hereditary spherocytosis arising "
-        "from ankyrin deficiency."
-    )
-    test_text4 = (
-        "Risk factors for breast cancer"
-    )
     doc = nlp(test_text4)
     res = vector_query(index_name=vector_index_name, query_vector=doc.vector)
     if res:
-        for r in res:
+        for r in res[0:5]:
             if r["score"] > 0.5:
-                logger.info(f'full sent {r}')
+                logger.info(pp.pprint(r))
 
 
+# standard match against sentence text
 def q3():
-    q='breast cancer'
+    q=test_text4
     body={
         # "from":from_val,
         "size": 5,
@@ -107,10 +115,10 @@ def q3():
     if res:
         for r in res['hits']['hits']:
             if r["_score"] > 0.5:
-                logger.info(f'{r}')
+                logger.info(pp.pprint(r))
 
 
 #q1()
-#q2()
+q2()
 q3()
 
