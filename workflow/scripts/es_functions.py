@@ -203,7 +203,7 @@ def delete_index(index_name):
         logger.info(f"{index_name} does not exist")
 
 
-def query_record(
+def vector_query(
     index_name, query_vector, record_size=100000, search_size=1000, score_min=0
 ):
     script_query = {
@@ -249,3 +249,14 @@ def query_record(
         return results[0:10]
     except:
         return []
+
+def standard_query(
+    index_name, body
+):
+    res = es.search(
+        ignore_unavailable=True,
+        request_timeout=TIMEOUT,
+        index=index_name,
+        body=body
+    )
+    return res

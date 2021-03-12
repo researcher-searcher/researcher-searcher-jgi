@@ -1,11 +1,11 @@
 from loguru import logger
-from workflow.scripts.es_functions import query_record
+from workflow.scripts.es_functions import vector_query, standard_query
 from workflow.scripts.general import load_spacy_model
 
 vector_index_name = "sentence_vectors"
-nlp = load_spacy_model()
 
 def q1():
+    nlp = load_spacy_model()
     test_text1 = (
         "Funding is available from MRC’s Infections and Immunity Board to provide large, "
         "long-term and renewable programme funding for researchers working in the area of "
@@ -27,7 +27,7 @@ def q1():
 
         # vectors
         sent_vec = sent.vector
-        res = query_record(index_name=vector_index_name, query_vector=sent_vec)
+        res = vector_query(index_name=vector_index_name, query_vector=sent_vec)
         if res:
             for r in res:
                 if r["score"] > 0.5:
@@ -52,13 +52,14 @@ def q1():
         logger.info(noun_chunk_string)
         if noun_chunk_string != '':
             chunk_vec = nlp(noun_chunk_string).vector
-            res = query_record(index_name=vector_index_name, query_vector=chunk_vec)
+            res = vector_query(index_name=vector_index_name, query_vector=chunk_vec)
             if res:
                 for r in res:
                     if r["score"] > 0.5:
                         logger.info(f'chunk {r}')
 
 def q2():
+    nlp = load_spacy_model()
     test_text4 = (
         "Ankyrin-R provides a key link between band 3 and the spectrin cytoskeleton that helps to maintain the highly "
         "specialised erythrocyte biconcave shape. Ankyrin deficiency results in fragile spherocytic erythrocytes with "
@@ -81,21 +82,35 @@ def q2():
         "Risk factors for breast cancer"
     )
     doc = nlp(test_text4)
-    res = query_record(index_name=vector_index_name, query_vector=doc.vector)
+    res = vector_query(index_name=vector_index_name, query_vector=doc.vector)
     if res:
         for r in res:
             if r["score"] > 0.5:
                 logger.info(f'full sent {r}')
 
 
-# def query_text_data():
-# todo
+def q3():
+    q='breast cancer'
+    body={
+        # "from":from_val,
+        "size": 5,
+        "query": {
+             "match": {
+                "sent_text": {
+                    "query": q     
+                }
+            }
+        },
+        "_source": ["doc_id","sent_num","sent_text"]
+    }
+    res = standard_query(index_name=vector_index_name,body=body)
+    if res:
+        for r in res['hits']['hits']:
+            if r["_score"] > 0.5:
+                logger.info(f'{r}')
 
-# index_vector_data()
-#res = q1()
-res = q2()
-# if res:
-#    for r in res:
-#        logger.info(r)
-# else:
-#    logger.info('No results')
+
+#q1()
+#q2()
+q3()
+
