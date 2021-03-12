@@ -19,11 +19,14 @@ class Options:
 
     top: int = -1  # How many to read
 
-
 parser.add_arguments(Options, dest="options")
 
 args = parser.parse_args()
 
+# problem pages
+# https://research-information.bris.ac.uk/en/publications/skin-pigmentation-sun-exposure-and-vitamin-d-levels-in-children-o
+# https://research-information.bris.ac.uk/en/publications/improving-womens-diet-quality-preconceptionally-and-during-gestat
+# https://research-information.bris.ac.uk/en/publications/maternal-reproductive-hormones-and-angiogenic-factors-in-pregnanc
 
 def read_file():
     df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
@@ -62,8 +65,9 @@ def create_research_data(df):
             abstract_data = get_research_data(rows["url"])
             # logger.debug(abstract_data)
             try:
-                d["abstract"] = abstract_data.getText().strip().replace("\n", " ")
-                logger.debug(abstract_data.getText())
+                abstract = abstract_data.getText(separator=" ").strip().replace("\n", " ")
+                d["abstract"] = abstract
+                logger.debug(abstract)
             except:
                 logger.warning(f"No abstract for {rows['url']}")
 
@@ -82,8 +86,11 @@ def get_research_data(url):
         "div",
         class_="rendering rendering_researchoutput rendering_researchoutput_abstractportal rendering_contributiontojournal rendering_abstractportal rendering_contributiontojournal_abstractportal",
     )
+    #logger.info(abstract_data.getText(separator=" ").strip().replace("\n", " "))
     return abstract_data
 
 if __name__ == "__main__":
     df = read_file()
     create_research_data(df)
+    #url='https://research-information.bris.ac.uk/en/publications/improving-womens-diet-quality-preconceptionally-and-during-gestat'
+    #get_research_data(url)

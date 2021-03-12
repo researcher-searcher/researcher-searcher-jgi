@@ -77,6 +77,9 @@ def q2():
         "flow cytometry provides an efficient and rapid approach for the categorisation of hereditary spherocytosis arising "
         "from ankyrin deficiency."
     )
+    test_text4 = (
+        "Risk factors for breast cancer"
+    )
     doc = nlp(test_text4)
     res = query_record(index_name=vector_index_name, query_vector=doc.vector)
     if res:
