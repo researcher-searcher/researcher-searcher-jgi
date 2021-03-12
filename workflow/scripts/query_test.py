@@ -1,5 +1,6 @@
 import json
 import pprint
+import pandas as pd
 from loguru import logger
 from workflow.scripts.es_functions import vector_query, standard_query
 from workflow.scripts.general import load_spacy_model
@@ -88,17 +89,18 @@ def q1():
 # use whole doc as vector
 def q2():
     nlp = load_spacy_model()
-    doc = nlp(test_text4)
+    doc = nlp(test_text5)
     res = vector_query(index_name=vector_index_name, query_vector=doc.vector)
     if res:
         for r in res[0:5]:
             if r["score"] > 0.5:
                 logger.info(pp.pprint(r))
+    return res
 
 
 # standard match against sentence text
 def q3():
-    q=test_text4
+    q=test_text5
     body={
         # "from":from_val,
         "size": 5,
@@ -116,9 +118,41 @@ def q3():
         for r in res['hits']['hits']:
             if r["_score"] > 0.5:
                 logger.info(pp.pprint(r))
+    return res
 
+# combine vectors and full text
+def q4():
+    summary = []
+    vector_res = q2()
+    for r in vector_res[:5]:
+        if r["score"] > 0.5:
+            summary.append(
+                {
+                'search':'vector',
+                'url':r["url"],
+                'sent_num':r['sent_num'],
+                'sent_text':r['sent_text'],
+                'score':r['score'],
+                }
+            )
+    text_res = q3()
+    for r in text_res['hits']['hits']:
+        #logger.debug(r['_source'])
+        summary.append(
+            {
+            'search':'text',
+            'url':r['_source']["doc_id"],
+            'sent_num':r['_source']['sent_num'],
+            'sent_text':r['_source']['sent_text'],
+            'score':r['_score'],
+            }
+        )
+    df = pd.DataFrame(summary)
+    print(df)
+    print(df['search'].value_counts())
+    df.to_csv('workflow/results/search.tsv',sep='\t')
 
 #q1()
-q2()
-q3()
-
+#q3()
+#q2()
+q4()

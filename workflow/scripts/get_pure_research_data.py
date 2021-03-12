@@ -23,7 +23,7 @@ parser.add_arguments(Options, dest="options")
 
 args = parser.parse_args()
 
-# problem pages
+# problem pages for abstract section headers
 # https://research-information.bris.ac.uk/en/publications/skin-pigmentation-sun-exposure-and-vitamin-d-levels-in-children-o
 # https://research-information.bris.ac.uk/en/publications/improving-womens-diet-quality-preconceptionally-and-during-gestat
 # https://research-information.bris.ac.uk/en/publications/maternal-reproductive-hormones-and-angiogenic-factors-in-pregnanc

@@ -1,6 +1,7 @@
 import scispacy
 import spacy
-
+import numpy as np
+from scipy.spatial import distance
 from loguru import logger
 
 
@@ -21,3 +22,25 @@ def load_spacy_model():
     # nlp.add_pipe("abbreviation_detector")
     logger.info("Done...")
     return nlp
+
+def create_aaa_distances(vectors=[]):
+    print('Creating distances...')
+    #https://stackoverflow.com/questions/48838346/how-to-speed-up-computation-of-cosine-similarity-between-set-of-vectors
+
+    print(len(vectors))
+    data = np.array(vectors)
+    pws = distance.pdist(data, metric='cosine')
+    #return as square-form distance matrix
+    pws = distance.squareform(pws)
+    print(len(pws))
+    return pws
+
+#takes an array of vectors
+def create_pair_distances(v1=[],v2=[]):
+    print('Creating distances...')
+    #https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html#scipy.spatial.distance.cdist
+
+    print(len(v1),len(v2))
+    y = distance.cdist(v1, v2, 'cosine')
+    print(len(y))
+    return y
