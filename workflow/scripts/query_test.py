@@ -3,10 +3,9 @@ from workflow.scripts.es_functions import query_record
 from workflow.scripts.general import load_spacy_model
 
 vector_index_name = "sentence_vectors"
+nlp = load_spacy_model()
 
-
-def query_vector_data():
-    nlp = load_spacy_model()
+def q1():
     test_text1 = (
         "Funding is available from MRC’s Infections and Immunity Board to provide large, "
         "long-term and renewable programme funding for researchers working in the area of "
@@ -58,14 +57,40 @@ def query_vector_data():
                 for r in res:
                     if r["score"] > 0.5:
                         logger.info(f'chunk {r}')
-    # return res
+
+def q2():
+    test_text4 = (
+        "Ankyrin-R provides a key link between band 3 and the spectrin cytoskeleton that helps to maintain the highly "
+        "specialised erythrocyte biconcave shape. Ankyrin deficiency results in fragile spherocytic erythrocytes with "
+        "reduced band 3 and protein 4.2 expression. We use in vitro differentiation of erythroblasts transduced with shRNAs "
+        "targeting the ANK1 gene to generate erythroblasts and reticulocytes with a novel ankyrin-R ‘near null’ human "
+        "phenotype with less than 5% of normal ankyrin expression. Using this model we demonstrate that absence of ankyrin "
+        "negatively impacts the reticulocyte expression of a variety of proteins including band 3, glycophorin A, spectrin, "
+        "adducin and more strikingly protein 4.2, CD44, CD47 and Rh/RhAG. Loss of band 3, which fails to form tetrameric "
+        "complexes in the absence of ankyrin, alongside GPA, occurs due to reduced retention within the reticulocyte membrane "
+        "during erythroblast enucleation. However, loss of RhAG is temporally and mechanistically distinct, occurring "
+        "predominantly as a result of instability at the plasma membrane and lysosomal degradation prior to enucleation. "
+        "Loss of Rh/RhAG was identified as common to erythrocytes with naturally occurring ankyrin deficiency and "
+        "demonstrated to occur prior to enucleation in cultures of erythroblasts from a hereditary spherocytosis patient "
+        "with severe ankyrin deficiency but not in those exhibiting milder reductions in expression. The identification of "
+        "prominently reduced surface expression of Rh/RhAG in combination with direct evaluation of ankyrin expression using "
+        "flow cytometry provides an efficient and rapid approach for the categorisation of hereditary spherocytosis arising "
+        "from ankyrin deficiency."
+    )
+    doc = nlp(test_text4)
+    res = query_record(index_name=vector_index_name, query_vector=doc.vector)
+    if res:
+        for r in res:
+            if r["score"] > 0.5:
+                logger.info(f'full sent {r}')
 
 
 # def query_text_data():
 # todo
 
 # index_vector_data()
-res = query_vector_data()
+#res = q1()
+res = q2()
 # if res:
 #    for r in res:
 #        logger.info(r)
