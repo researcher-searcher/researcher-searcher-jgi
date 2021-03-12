@@ -18,6 +18,7 @@ dependencies:
   - pip=20.2.4
   - beautifulsoup4
   - elasticsearch
+  - scikit-learn
   - pip:
     - wget
     - snakemake>=5.27
