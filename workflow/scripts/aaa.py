@@ -10,6 +10,7 @@ from workflow.scripts.es_functions import vector_query, standard_query
 from workflow.scripts.general import load_spacy_model, create_aaa_distances
 
 PEOPLE_DATA = 'workflow/results/person_data.tsv.gz'
+PERSON_METADATA = 'workflow/results/person_metadata.tsv.gz'
 RESEARCH_METADATA = 'workflow/results/research_metadata.tsv.gz'
 RESEARCH_DATA = 'workflow/results/text_data_vectors.pkl.gz'
 RESEARCH_VECTORS = 'workflow/results/research_vectors.pkl.gz'
@@ -134,9 +135,18 @@ def tsne_people():
     vector_df = pd.read_pickle(PEOPLE_VECTORS)
     vector_df['x']=x
     vector_df['y']=y
-    logger.info(vector_df.head())
+    
+    # add org info
+    org_df = pd.read_csv(PERSON_METADATA,sep='\t')[['email','academic-school-name']]
+    logger.info(org_df)
+    m = pd.merge(vector_df,org_df,left_on='email',right_on='email')
+    logger.info(m.head())
+
     plt.figure(figsize=(16,7))
-    sns.scatterplot(x='x',y='y',data=vector_df, legend="full")
+    sns.scatterplot(x='x',y='y',data=m, legend="full", style='academic-school-name', hue='academic-school-name')
+    plt.legend(bbox_to_anchor=(1.01, 1),borderaxespad=0)
+    plt.title("tSNE of person research")
+    plt.tight_layout()
     plt.savefig(f'workflow/results/people-tsne.pdf')  
 
 ########################################
@@ -148,9 +158,9 @@ def research_aaa():
     tsne_research()
 
 def people_aaa():
-    create_mean_people_vectors()
-    aaa=aaa_vectors(PEOPLE_VECTORS)
-    create_pairwise_people(aaa)
+    #create_mean_people_vectors()
+    #aaa=aaa_vectors(PEOPLE_VECTORS)
+    #create_pairwise_people(aaa)
     tsne_people()
     
 people_aaa()
