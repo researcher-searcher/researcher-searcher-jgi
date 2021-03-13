@@ -134,6 +134,21 @@ def altair_scatter_plot(source):
     ).interactive()
     chart.save('workflow/results/chart.html',scale_factor=10.0)
 
+def plotly_scatter_plot(df):
+    #import plotly.graph_objects as go
+    #fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
+    #fig.write_html('workflow/results/first_figure.html', auto_open=True)
+
+    import plotly.express as px
+    fig = px.scatter(
+        df, 
+        x="x", 
+        y="y", 
+        color="academic-school-name",
+        hover_data=['email']
+        )
+    fig.write_html('workflow/results/plotly.html')
+
 def tsne_people():
     df=pd.read_pickle(PEOPLE_PAIRS)
     logger.info(df.head())
@@ -153,6 +168,7 @@ def tsne_people():
     logger.info(org_df.head())
     logger.info(org_df.shape)
     m = pd.merge(vector_df,org_df,left_on='email',right_on='email')
+    m['academic-school-name'].fillna('NA',inplace=True)
     logger.info(m.head())
     logger.info(m.shape)
 
@@ -163,7 +179,8 @@ def tsne_people():
     plt.tight_layout()
     plt.savefig(f'workflow/results/people-tsne.pdf')  
 
-    altair_scatter_plot(m[['email','x','y','academic-school-name']])
+    #altair_scatter_plot(m[['email','x','y','academic-school-name']])
+    plotly_scatter_plot(m)
 
 ########################################
 
