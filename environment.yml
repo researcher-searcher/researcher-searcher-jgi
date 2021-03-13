@@ -19,6 +19,8 @@ dependencies:
   - beautifulsoup4
   - elasticsearch
   - scikit-learn
+  - altair
+  - plotly=4.14.3
   - pip:
     - wget
     - snakemake>=5.27

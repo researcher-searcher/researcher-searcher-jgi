@@ -3,6 +3,7 @@ import pprint
 import pandas as pd
 import numpy as np
 import seaborn as sns
+import altair as alt
 import matplotlib.pyplot as plt
 from loguru import logger
 from sklearn.manifold import TSNE
@@ -123,6 +124,16 @@ def create_pairwise_people(aaa):
     logger.info(f'Writing {PEOPLE_PAIRS}')
     df.to_pickle(PEOPLE_PAIRS)  
 
+def altair_scatter_plot(source):
+    chart = alt.Chart(source).mark_point().encode(
+        x='x',
+        y='y',
+        color='academic-school-name',
+        shape='academic-school-name',
+        tooltip=['email', 'academic-school-name'],
+    ).interactive()
+    chart.save('workflow/results/chart.html',scale_factor=10.0)
+
 def tsne_people():
     df=pd.read_pickle(PEOPLE_PAIRS)
     logger.info(df.head())
@@ -135,12 +146,15 @@ def tsne_people():
     vector_df = pd.read_pickle(PEOPLE_VECTORS)
     vector_df['x']=x
     vector_df['y']=y
+    logger.info(vector_df.shape)
     
     # add org info
     org_df = pd.read_csv(PERSON_METADATA,sep='\t')[['email','academic-school-name']]
-    logger.info(org_df)
+    logger.info(org_df.head())
+    logger.info(org_df.shape)
     m = pd.merge(vector_df,org_df,left_on='email',right_on='email')
     logger.info(m.head())
+    logger.info(m.shape)
 
     plt.figure(figsize=(16,7))
     sns.scatterplot(x='x',y='y',data=m, legend="full", style='academic-school-name', hue='academic-school-name')
@@ -148,6 +162,8 @@ def tsne_people():
     plt.title("tSNE of person research")
     plt.tight_layout()
     plt.savefig(f'workflow/results/people-tsne.pdf')  
+
+    altair_scatter_plot(m[['email','x','y','academic-school-name']])
 
 ########################################
 
