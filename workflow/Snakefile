@@ -23,22 +23,22 @@ rule find_person:
         python -m workflow.scripts.find_pure_people --input {input} --output {output} --top 1000
         """
 
-rule get_person_data:
-    input: PERSON_DATA
-    output: PERSON_METADATA
-    shell: 
-        """
-        python -m workflow.scripts.get_pure_person_data --input {input} --output {output}
-        """
-
 #rule get_person_data:
 #    input: PERSON_DATA
-#    output: a=PERSON_METADATA,b=RESEARCH_METADATA
+#    output: PERSON_METADATA
 #    shell: 
 #        """
-#        python -m workflow.scripts.get_pure_person_data --input {input} --output {output.a}
-#        python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output.b}
+#        python -m workflow.scripts.get_pure_person_data --input {input} --output {output}
 #        """
+
+rule get_person_data:
+    input: PERSON_DATA
+    output: a=PERSON_METADATA,b=RESEARCH_METADATA
+    shell: 
+        """
+        python -m workflow.scripts.get_pure_person_data --input {input} --output {output.a}
+        python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output.b}
+        """
 
 
 #rule get_research_output:

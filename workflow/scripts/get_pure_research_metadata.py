@@ -70,27 +70,35 @@ def create_research_data(person_df):
 
 def get_research_output(url):
     logger.debug(url)
+    research_output = []
     try:        
         research_url = f"{url}/publications"
         res = requests.get(research_url)
         soup = BeautifulSoup(res.text, "html.parser")
+        research_output.extend(soup.find_all("a", class_="link", rel=re.compile("ContributionTo.*")))
+        logger.debug(len(research_output))
         # check for pagination
         pagination = soup.find("nav", class_="pages")
         if pagination:
-            logger.info(pagination)
             for li in pagination.findAll('a',class_="step"):
-                page = li.getText()
+                page = int(li.getText())
                 logger.info(page)
-        # <a rel="ContributionToJournal" href="https://research-information.bris.ac.uk/en/publications/coffee-consumption-and-risk-of-breast-cancer-a-mendelian-randomiz" class="link"><span>Coffee consumption and risk of breast cancer: a Mendelian Randomization study </span></a>
-        research_output = soup.find_all("a", class_="link", rel="ContributionToJournal")
+                research_url = f"{url}/publications/?page={page-1}"
+                logger.debug(research_url)
+                res = requests.get(research_url)
+                soup = BeautifulSoup(res.text, "html.parser")
+                research_output.extend(soup.find_all("a", class_="link", rel=re.compile("ContributionTo.*")))
+                logger.debug(len(research_output))
     except:
         logger.warning("get_research_output failed")
-        research_output = []
     #logger.debug(research_output)
     return research_output
 
-if __name__ == "__main__":
-    #person_df = read_file()
-    #create_research_data(person_df)
+def test():
     url='https://research-information.bris.ac.uk/en/persons/tom-r-gaunt'
     get_research_output(url)
+
+if __name__ == "__main__":
+    person_df = read_file()
+    create_research_data(person_df)
+    #test()
