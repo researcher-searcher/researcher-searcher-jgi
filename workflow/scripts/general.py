@@ -13,10 +13,9 @@ def mark_as_complete(name):
 
 def load_spacy_model():
     model_name = "en_core_web_trf"
+    model_name = "en_core_web_lg"
     # Load English tokenizer, tagger, parser and NER
     logger.info(f"Loading spacy model {model_name}")
-    # nlp = spacy.load("en_core_web_sm")
-    #nlp = spacy.load("en_core_web_lg")
     nlp = spacy.load(model_name)
     # nlp = spacy.load("en_core_sci_scibert")
     # nlp = spacy.load("en_core_sci_lg")
@@ -24,8 +23,9 @@ def load_spacy_model():
     # nlp.add_pipe("abbreviation_detector")
 
     # add max length for transformer
-    if model_name == 'en_core_web_trf':
-        nlp.max_length = 512
+    #if model_name == 'en_core_web_trf':
+    #    nlp.max_length = 512
+    #nlp.max_length=10000
     logger.info("Done...")
     return nlp
 

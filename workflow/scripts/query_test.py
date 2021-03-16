@@ -48,10 +48,10 @@ test_text5 = (
 test_text6 = "neuroscience"
 
 # create vectof of each string
-def q1():
+def q1(text):
     nlp = load_spacy_model()
 
-    doc = nlp(test_text3)
+    doc = nlp(text)
     for sent in doc.sents:
         logger.info(sent)
 
@@ -89,9 +89,9 @@ def q1():
                         logger.info(f'chunk {r}')
 
 # use whole doc as vector
-def q2():
+def q2(text):
     nlp = load_spacy_model()
-    doc = nlp(test_text6)
+    doc = nlp(text)
     res = vector_query(index_name=vector_index_name, query_vector=doc.vector)
     if res:
         for r in res[0:5]:
@@ -101,15 +101,14 @@ def q2():
 
 
 # standard match against sentence text
-def q3():
-    q=test_text6
+def q3(text):
     body={
         # "from":from_val,
         "size": 5,
         "query": {
              "match": {
                 "sent_text": {
-                    "query": q     
+                    "query": text     
                 }
             }
         },
@@ -123,9 +122,9 @@ def q3():
     return res
 
 # combine vectors and full text
-def q4():
+def q4(text):
     summary = []
-    vector_res = q2()
+    vector_res = q2(text)
     for r in vector_res[:5]:
         if r["score"] > 0.5:
             summary.append(
@@ -137,7 +136,7 @@ def q4():
                 'score':r['score'],
                 }
             )
-    text_res = q3()
+    text_res = q3(text)
     for r in text_res['hits']['hits']:
         #logger.debug(r['_source'])
         summary.append(
@@ -155,6 +154,7 @@ def q4():
     df.to_csv('workflow/results/search.tsv',sep='\t')
 
 #q1()
-q2()
+#q2()
 #q3()
-#q4()
+text = 'how impactful is bioinformatics?'
+q4(text)
