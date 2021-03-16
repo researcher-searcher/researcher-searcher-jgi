@@ -22,6 +22,10 @@ def load_spacy_model():
     # nlp = spacy.load("en_core_sci_lg")
     # nlp = spacy.load("en_ner_bionlp13cg_md")
     # nlp.add_pipe("abbreviation_detector")
+
+    # add max length for transformer
+    if model_name == 'en_core_web_trf':
+        nlp.max_length = 512
     logger.info("Done...")
     return nlp
 

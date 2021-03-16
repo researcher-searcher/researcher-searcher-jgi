@@ -86,7 +86,7 @@ def run_nlp(research_df, noun_data, vector_data):
     text = list(research_df["text"])
     docs = list(nlp.pipe(text))
     logger.info(f'Created {len(docs)} NLP objects')
-    
+
     for i in range(0, len(docs)):
         doc = docs[i]
         #logger.info(doc)
