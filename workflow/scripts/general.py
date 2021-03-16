@@ -12,10 +12,12 @@ def mark_as_complete(name):
 
 
 def load_spacy_model():
+    model_name = "en_core_web_trf"
     # Load English tokenizer, tagger, parser and NER
-    logger.info("Loading spacy model...")
+    logger.info(f"Loading spacy model {model_name}")
     # nlp = spacy.load("en_core_web_sm")
-    nlp = spacy.load("en_core_web_lg")
+    #nlp = spacy.load("en_core_web_lg")
+    nlp = spacy.load(model_name)
     # nlp = spacy.load("en_core_sci_scibert")
     # nlp = spacy.load("en_core_sci_lg")
     # nlp = spacy.load("en_ner_bionlp13cg_md")

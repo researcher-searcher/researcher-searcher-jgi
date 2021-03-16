@@ -45,6 +45,8 @@ test_text5 = (
     "Risk factors for breast cancer"
 )
 
+test_text6 = "neuroscience"
+
 # create vectof of each string
 def q1():
     nlp = load_spacy_model()
@@ -89,18 +91,18 @@ def q1():
 # use whole doc as vector
 def q2():
     nlp = load_spacy_model()
-    doc = nlp(test_text5)
+    doc = nlp(test_text6)
     res = vector_query(index_name=vector_index_name, query_vector=doc.vector)
     if res:
         for r in res[0:5]:
-            if r["score"] > 0.5:
+            if r["score"] > 0:
                 logger.info(pp.pprint(r))
     return res
 
 
 # standard match against sentence text
 def q3():
-    q=test_text5
+    q=test_text6
     body={
         # "from":from_val,
         "size": 5,
@@ -153,6 +155,6 @@ def q4():
     df.to_csv('workflow/results/search.tsv',sep='\t')
 
 #q1()
+q2()
 #q3()
-#q2()
-q4()
+#q4()

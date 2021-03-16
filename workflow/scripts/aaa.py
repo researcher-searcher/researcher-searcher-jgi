@@ -191,9 +191,9 @@ def research_aaa():
     tsne_research()
 
 def people_aaa():
-    #create_mean_people_vectors()
-    #aaa=aaa_vectors(PEOPLE_VECTORS)
-    #create_pairwise_people(aaa)
+    create_mean_people_vectors()
+    aaa=aaa_vectors(PEOPLE_VECTORS)
+    create_pairwise_people(aaa)
     tsne_people()
     
 people_aaa()

@@ -28,6 +28,7 @@ def create_vector_index(index_name, dim_size):
                 "_source": {"enabled": "true"},
                 "properties": {
                     "doc_id": {"type": "keyword"},
+                    "year": {"type": "integer"},
                     "sent_id": {"type": "keyword"},
                     "sent_text": {"type": "text"},
                     "sent_vector": {"type": "dense_vector", "dims": dim_size},
@@ -56,6 +57,7 @@ def create_noun_index(index_name, dim_size):
                 "_source": {"enabled": "true"},
                 "properties": {
                     "doc_id": {"type": "keyword"},
+                    "year": {"type": "integer"},
                     "sent_num": {"type": "keyword"},
                     "noun_phrase": {"type": "text"},
                 },
@@ -97,13 +99,14 @@ def index_vector_data(df, index_name):
             bulk_data = []
         # print(line.decode('utf-8'))
         if np.count_nonzero(rows["vector"]) == 0:
-            logger.info(
-                f"{rows['url']} {rows['sent_num']} returned empty vector so skipping"
-            )
+            #logger.info(
+            #    f"{rows['url']} {rows['sent_num']} returned empty vector so skipping"
+            #)
             continue
         else:
             data_dict = {
                 "doc_id": rows["url"],
+                "year": rows["year"],
                 "sent_num": rows["sent_num"],
                 "sent_text": rows["sent_text"],
                 "sent_vector": rows["vector"],
@@ -164,6 +167,7 @@ def index_noun_data(df, index_name):
             bulk_data = []
         data_dict = {
             "doc_id": rows["url"],
+            "year": rows["year"],
             "sent_num": rows["sent_num"],
             "noun_phrase": rows["noun_phrase"]
         }
@@ -223,7 +227,7 @@ def vector_query(
             body={
                 "size": search_size,
                 "query": script_query,
-                "_source": {"includes": ["doc_id", "sent_num", "sent_text"]},
+                "_source": {"includes": ["doc_id", "year", "sent_num", "sent_text"]},
             },
         )
         search_time = time.time() - search_start
@@ -241,6 +245,7 @@ def vector_query(
                 results.append(
                     {
                         "url": hit["_source"]["doc_id"],
+                        "year": hit["_source"]["year"],
                         "sent_num": hit["_source"]["sent_num"],
                         "sent_text": hit["_source"]["sent_text"],
                         "score": hit["_score"] - 1,

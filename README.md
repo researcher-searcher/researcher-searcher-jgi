@@ -8,6 +8,7 @@ Researcher Searcher for data science community at University of Bristol
 - https://spacy.io/models/en
 
 python -m spacy download en_core_web_lg
+python -m spacy download en_core_web_trf
 
 ### ScispaCy
 

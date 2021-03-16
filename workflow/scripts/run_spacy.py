@@ -82,10 +82,11 @@ def run_nlp(research_df, noun_data, vector_data):
     # do we need to filter stopwords?
     spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 
+    logger.info('Running NLP on docs...')
     text = list(research_df["text"])
     docs = list(nlp.pipe(text))
-
-    logger.info(f'Create {len(docs)} NLP objects')
+    logger.info(f'Created {len(docs)} NLP objects')
+    
     for i in range(0, len(docs)):
         doc = docs[i]
         #logger.info(doc)
@@ -104,6 +105,7 @@ def run_nlp(research_df, noun_data, vector_data):
             vector_data.append(
                 {
                     "url": df_row["url"],
+                    "year": df_row["year"],
                     "sent_num": sent_num,
                     "sent_text": sent.text,
                     "vector": list(sent.vector),
@@ -128,7 +130,12 @@ def run_nlp(research_df, noun_data, vector_data):
                     # null string values cause problems with ES, also no need to keep anything less than 3 characters
                     if str(chunk) != 'null' and len(str(chunk))>2:
                         noun_data.append(
-                            {"url": df_row["url"], "sent_num": sent_num, "noun_phrase": chunk}
+                            {
+                                "url": df_row["url"], 
+                                "year": df_row["year"], 
+                                "sent_num": sent_num, 
+                                "noun_phrase": chunk
+                                }
                         )
             #logger.info(
             #    f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
