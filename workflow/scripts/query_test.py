@@ -156,5 +156,5 @@ def q4(text):
 #q1()
 #q2()
 #q3()
-text = 'how impactful is bioinformatics?'
+text = 'military health'
 q4(text)
