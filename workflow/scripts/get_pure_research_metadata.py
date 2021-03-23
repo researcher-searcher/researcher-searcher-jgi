@@ -30,6 +30,7 @@ logger.debug("options:", args.options.top)
 def read_file():
     person_df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
     logger.debug(person_df.head())
+    person_df['email'] = person_df['email'].str.lower()
     return person_df
 
 
@@ -55,12 +56,21 @@ def create_research_data(person_df):
         if rows["email"] in existing_data:
             logger.debug(f"{rows['email']} already done")
         else:
-            research_output = get_research_output(rows["page"])
+            url = rows["page"]
+            if not url.startswith('https:'):
+                logger.warning(f'Bad URL: {url}')
+                continue
+            research_output = get_research_output(url)
+            # add empty row if no data
+            if len(research_output) == 0:
+                data.append(
+                    {"email": rows["email"], "url": "NA", "title": "NA"}
+                )
             # research_output = get_research_output('https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth')
             for r in research_output:
                 # logger.debug(i)
                 data.append(
-                    {"email": rows["email"], "url": r["href"], "title": r.getText()}
+                    {"email": rows["email"], "url": r["href"], "title": r.getText(separator=" ").strip().replace("\n", " ")}
                 )
     # logger.debug(d)
     research_df = pd.DataFrame(data)

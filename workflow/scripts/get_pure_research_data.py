@@ -59,7 +59,6 @@ def create_research_data(df):
         else:
             d = {
                 "url": rows["url"],
-                "title": rows["title"],
                 "abstract": "NA",
             }
             abstract_data,pub_date = get_research_data(rows["url"])

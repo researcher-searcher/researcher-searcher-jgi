@@ -55,7 +55,7 @@ def create_research_data(person_df):
         else:
             url = rows["page"]
             if not url.startswith('https:'):
-                logger.info(f'Bad URL: {url}')
+                logger.warning(f'Bad URL: {url}')
                 continue
             person_data, orcid_data = get_person_data(url)
             d = {
