@@ -27,8 +27,9 @@ args = parser.parse_args()
 
 def read_file():
     person_df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
+    person_df['email'] = person_df['email'].str.lower()
+    logger.info(person_df.head())
     return person_df
-
 
 def create_research_data(person_df):
     data = []
@@ -46,12 +47,17 @@ def create_research_data(person_df):
         except:
             logger.warning(f"Error when reading {f}")
         logger.debug(f"Got data on {len(existing_data)} urls")
+        exit()
 
     for i, rows in person_df.iterrows():
         if rows["email"] in existing_data:
             logger.info(f"{rows['email']} already done")
         else:
-            person_data, orcid_data = get_person_data(rows["page"])
+            url = rows["page"]
+            if not url.startswith('https:'):
+                logger.info(f'Bad URL: {url}')
+                continue
+            person_data, orcid_data = get_person_data(url)
             d = {
                 "email": rows["email"],
                 "job-description": "NA",

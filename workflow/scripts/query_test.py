@@ -47,6 +47,11 @@ test_text5 = (
 
 test_text6 = "neuroscience"
 
+#https://pubmed.ncbi.nlm.nih.gov/25751625/
+test_text7 = (
+    "Genome-wide association studies (GWAS) and large-scale replication studies have identified common variants in 79 loci associated with breast cancer, explaining ∼14% of the familial risk of the disease. To identify new susceptibility loci, we performed a meta-analysis of 11 GWAS, comprising 15,748 breast cancer cases and 18,084 controls together with 46,785 cases and 42,892 controls from 41 studies genotyped on a 211,155-marker custom array (iCOGS). Analyses were restricted to women of European ancestry. We generated genotypes for more than 11 million SNPs by imputation using the 1000 Genomes Project reference panel, and we identified 15 new loci associated with breast cancer at P < 5 × 10(-8). Combining association analysis with ChIP-seq chromatin binding data in mammary cell lines and ChIA-PET chromatin interaction data from ENCODE, we identified likely target genes in two regions: SETBP1 at 18q12.3 and RNF115 and PDZK1 at 1q21.1. One association appears to be driven by an amino acid substitution encoded in EXO1."
+)
+
 # create vectof of each string
 def q1(text):
     nlp = load_spacy_model()
@@ -157,4 +162,5 @@ def q4(text):
 #q2()
 #q3()
 text = 'military health'
+text = 'Text to - speech/ speech - to -text'
 q4(text)
