@@ -47,7 +47,6 @@ def create_research_data(person_df):
         except:
             logger.warning(f"Error when reading {f}")
         logger.debug(f"Got data on {len(existing_data)} urls")
-        exit()
 
     for i, rows in person_df.iterrows():
         if rows["email"] in existing_data:

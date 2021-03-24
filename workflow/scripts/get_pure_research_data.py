@@ -31,6 +31,7 @@ args = parser.parse_args()
 def read_file():
     df = pd.read_csv(f"{args.input}.tsv.gz", sep="\t")
     df.drop_duplicates(subset="url", inplace=True)
+    df.dropna(inplace=True)
     logger.debug(df.head())
     return df
 
@@ -59,6 +60,7 @@ def create_research_data(df):
         else:
             d = {
                 "url": rows["url"],
+                "title": rows["title"],
                 "abstract": "NA",
             }
             abstract_data,pub_date = get_research_data(rows["url"])

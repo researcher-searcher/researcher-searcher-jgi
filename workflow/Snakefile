@@ -31,6 +31,14 @@ rule find_person:
 #        python -m workflow.scripts.get_pure_person_data --input {input} --output {output}
 #        """
 
+#rule get_research_output:
+#    input: PERSON_DATA
+#    output: RESEARCH_METADATA
+#    shell:
+#        """
+#        python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output}
+#        """
+
 rule get_person_data:
     input: PERSON_DATA
     output: a=PERSON_METADATA,b=RESEARCH_METADATA
@@ -39,15 +47,6 @@ rule get_person_data:
         python -m workflow.scripts.get_pure_person_data --input {input} --output {output.a}
         python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output.b}
         """
-
-
-#rule get_research_output:
-#    input: PERSON_DATA
-#    output: RESEARCH_METADATA
-#    shell:
-#        """
-#        python -m workflow.scripts.get_pure_research_metadata --input {input} --output {output}
-#        """
 
 rule get_research_details:
     input: RESEARCH_METADATA
