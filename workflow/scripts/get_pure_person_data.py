@@ -60,10 +60,7 @@ def create_research_data(person_df):
             d = {
                 "email": rows["email"],
                 "job-description": "NA",
-                "academic-school-url": "NA",
-                "academic-school-name": "NA",
-                "sri-url": "NA",
-                "sri-name": "NA",
+                "org": [],
                 "orcid": "NA",
             }
             # person_data,orcid_data = get_person_data('https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth')
@@ -75,24 +72,29 @@ def create_research_data(person_df):
             except:
                 logger.warning("No job-description")
             try:
-                x = person_data.find(class_="link academicschool")
-                d["academic-school-url"] = x["href"]
-                d["academic-school-name"] = x.getText()
-            except:
-                logger.warning("No academicschool data")
-            try:
-                x = person_data[0].find(class_="link sri")
-                d["sri-url"] = x["href"]
-                d["sri-name"] = x.getText()
-            except:
-                logger.warning("No sri data")
-            try:
                 d["orcid"] = orcid_data["href"]
             except:
                 logger.warning("No orcid data")
+            try:
+                x = person_data.find_all('a')
+                for i in x:
+                    if "Organisation" in i['rel']:
+                        org_name = i.getText()
+                        org_type = i.attrs['class'][1]
+                        org_url = i['href']
+                        #logger.debug(f'{org_name} {org_type}')
+                        d["org"].append(f'{org_name}::{org_type}::{org_url}')
+            except:
+                logger.debug('No org data')
             data.append(d)
+            
     # logger.info(data)
     person_details = pd.DataFrame(data)
+    # explode the org data
+    person_details = person_details.explode('org')
+    # create two columns
+    person_details[['org-name', 'org-type','org-url']] = person_details['org'].str.split('::', expand=True)
+    person_details.drop('org',axis=1,inplace=True)
     person_details.to_csv(f, sep="\t", index=False)
     mark_as_complete(args.output)
 
@@ -113,6 +115,23 @@ def get_person_data(url):
         person_data = orcid_data = "NA"
     return person_data, orcid_data
 
+def test():
+    person_data, orcid_data = get_person_data('https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth')
+    x = person_data.find_all('a')
+    for i in x:
+        try:
+            if "Organisation" in i['rel']:
+                #print(i,i['rel'])
+                org_name = i.getText()
+                org_type = i.attrs['class'][1]
+                org_url = i['href']
+                print(org_name,org_type,org_url)
+                #name = i.getText()
+                #org = 
+        except:
+            logger.debug(f'{i} is not an Org')
+
 if __name__ == "__main__":
     person_df = read_file()
     create_research_data(person_df)
+    #test()
