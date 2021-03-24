@@ -144,7 +144,7 @@ def plotly_scatter_plot(df):
         df, 
         x="x", 
         y="y", 
-        color="academic-school-name",
+        color="org-name",
         hover_data=['email']
         )
     fig.write_html('workflow/results/plotly.html')
@@ -164,16 +164,17 @@ def tsne_people():
     logger.info(vector_df.shape)
     
     # add org info
-    org_df = pd.read_csv(PERSON_METADATA,sep='\t')[['email','academic-school-name']]
+    org_df = pd.read_csv(PERSON_METADATA,sep='\t')[['email','org-name','org-type']]
     logger.info(org_df.head())
     logger.info(org_df.shape)
     m = pd.merge(vector_df,org_df,left_on='email',right_on='email')
-    m['academic-school-name'].fillna('NA',inplace=True)
+    m = m[m['org-type'].isin(['academicschool','academicdepartment'])]
+    m['org-name'].fillna('NA',inplace=True)
     logger.info(m.head())
     logger.info(m.shape)
 
     plt.figure(figsize=(16,7))
-    sns.scatterplot(x='x',y='y',data=m, legend="full", style='academic-school-name', hue='academic-school-name')
+    sns.scatterplot(x='x',y='y',data=m, legend="full", style='org-name', hue='org-name')
     plt.legend(bbox_to_anchor=(1.01, 1),borderaxespad=0)
     plt.title("tSNE of person research")
     plt.tight_layout()
