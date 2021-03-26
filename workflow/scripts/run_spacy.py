@@ -100,46 +100,45 @@ def run_nlp(research_df, noun_data, vector_data):
         for sent in doc.sents:
             #logger.info(sent.text)
             words = [token.text for token in sent]
-            if len(words)<2:
-                logger.info(words)
-                continue
-            # create vectors
-            # print(doc.vector)
-            vector_data.append(
-                {
-                    "url": df_row["url"],
-                    "year": df_row["year"],
-                    "sent_num": sent_num,
-                    "sent_text": sent.text,
-                    "vector": list(sent.vector),
-                }
-            )
+            if len(words)>2:
+                
+                # create vectors
+                # print(doc.vector)
+                vector_data.append(
+                    {
+                        "url": df_row["url"],
+                        "year": df_row["year"],
+                        "sent_num": sent_num,
+                        "sent_text": sent.text,
+                        "vector": list(sent.vector),
+                    }
+                )
 
-            # Analyze syntax
-            for chunk in sent.noun_chunks:
-                # logger.debug(chunk)
-                # remove stopwords and things
-                if (
-                    all(
-                        token.is_stop != True
-                        and token.is_punct != True
-                        for token in chunk
-                    )
-                    == True
-                ):
-                    # not sure if should filter on number of words in chunk?
-                    # if len(chunk) > 1:
-
-                    # null string values cause problems with ES, also no need to keep anything less than 3 characters
-                    if str(chunk) != 'null' and len(str(chunk))>2:
-                        noun_data.append(
-                            {
-                                "url": df_row["url"], 
-                                "year": df_row["year"], 
-                                "sent_num": sent_num, 
-                                "noun_phrase": chunk
-                                }
+                # Analyze syntax
+                for chunk in sent.noun_chunks:
+                    # logger.debug(chunk)
+                    # remove stopwords and things
+                    if (
+                        all(
+                            token.is_stop != True
+                            and token.is_punct != True
+                            for token in chunk
                         )
+                        == True
+                    ):
+                        # not sure if should filter on number of words in chunk?
+                        # if len(chunk) > 1:
+
+                        # null string values cause problems with ES, also no need to keep anything less than 3 characters
+                        if str(chunk) != 'null' and len(str(chunk))>2:
+                            noun_data.append(
+                                {
+                                    "url": df_row["url"], 
+                                    "year": df_row["year"], 
+                                    "sent_num": sent_num, 
+                                    "noun_phrase": chunk
+                                    }
+                            )
             #logger.info(
             #    f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
             #)
