@@ -27,3 +27,4 @@ dependencies:
     - simple-parsing
     - spacy
     - scispacy
+    - spacy-universal-sentence-encoder

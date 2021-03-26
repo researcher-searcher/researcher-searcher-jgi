@@ -5,6 +5,7 @@ import numpy as np
 import seaborn as sns
 import altair as alt
 import matplotlib.pyplot as plt
+import os
 from loguru import logger
 from sklearn.manifold import TSNE
 from workflow.scripts.es_functions import vector_query, standard_query
@@ -22,48 +23,60 @@ PEOPLE_PAIRS = 'workflow/results/people_vector_pairs.pkl.gz'
 tSNE=TSNE(n_components=2)
 
 def create_mean_research_vectors():
-    logger.info(f'Reading {RESEARCH_DATA}')
-    df = pd.read_pickle(RESEARCH_DATA)
-    logger.info(df.head())
+    if os.path.exists(RESEARCH_VECTORS):
+        logger.info(f'{RESEARCH_VECTORS} done')
+    else:
+        logger.info(f'Reading {RESEARCH_DATA}')
+        df = pd.read_pickle(RESEARCH_DATA)
+        logger.info(f'\n{df.head()}')
 
-    vectors = df[['url','vector']].groupby(['url'])
-    data = []
-    for v in vectors:
-        vector_list = list(v[1]['vector'])
-        mean_vector = list(np.mean(vector_list,axis=0))
-        data.append({'url':v[0],'vector':mean_vector})
-    md = pd.DataFrame(data)
-    md.to_pickle(RESEARCH_VECTORS)
+        vectors = df[['url','vector']].groupby(['url'])
+        data = []
+        for v in vectors:
+            vector_list = list(v[1]['vector'])
+            mean_vector = list(np.mean(vector_list,axis=0))
+            data.append({'url':v[0],'vector':mean_vector})
+        md = pd.DataFrame(data)
+        md.to_pickle(RESEARCH_VECTORS)
 
-def aaa_vectors(vector_file):
-    vector_df = pd.read_pickle(vector_file)
-    vectors = list(vector_df['vector'])
-    logger.info(len(vectors))
-    aaa = create_aaa_distances(vectors)
-    return aaa
+def aaa_vectors(vector_file,name):
+    aaa_file = f'workflow/results/{name}-aaa.npy'
+    if os.path.exists(aaa_file):
+        logger.info(f'{aaa_file} done')
+        return np.load(aaa_file)
+    else:
+        vector_df = pd.read_pickle(vector_file)
+        vectors = list(vector_df['vector'])
+        logger.info(len(vectors))
+        aaa = create_aaa_distances(vectors)
+        np.save(aaa_file,aaa)
+        return aaa
 
 def create_pairwise_research(aaa):
     vector_df = pd.read_pickle(RESEARCH_VECTORS)
     num = vector_df.shape[0]
     data = []
     urls = list(vector_df['url'])
+    #pcheck=[]
     for i in range(0,num):
         if i % 1000 == 0:
             logger.info(i)
         iname = urls[i]
         for j in range(0,num):
             jname = urls[j]
-            score = 1-aaa[i][j]
-            # reduce the output of this 
-            # remove same pairs 
-            # filter on score (what value?)
-            if iname != jname and score>0.9: 
-                data.append({
-                    'url1':iname,
-                    'url2':jname,
-                    'score': 1-aaa[i][j]
-                })
+            if j>i:
+                score = 1-aaa[i][j]
+                # reduce the output of this 
+                # remove same pairs 
+                # filter on score (what value?)
+                if iname != jname and score>0.95: 
+                    data.append({
+                        'url1':iname,
+                        'url2':jname,
+                        'score': score
+                    })
     df = pd.DataFrame(data)
+    logger.info(df.shape)
     df.drop_duplicates(subset=['url1','url2'],inplace=True)
     logger.info(f'Writing {RESEARCH_PAIRS}')
     df.to_pickle(RESEARCH_PAIRS)    
@@ -192,13 +205,13 @@ def tsne_people():
 
 def research_aaa():
     create_mean_research_vectors()
-    aaa=aaa_vectors(RESEARCH_VECTORS)
+    aaa=aaa_vectors(RESEARCH_VECTORS,'research')
     create_pairwise_research(aaa)
     tsne_research()
 
 def people_aaa():
     create_mean_people_vectors()
-    aaa=aaa_vectors(PEOPLE_VECTORS)
+    aaa=aaa_vectors(PEOPLE_VECTORS,'people')
     create_pairwise_people(aaa)
     tsne_people()
 

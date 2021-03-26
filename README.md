@@ -6,9 +6,11 @@ Researcher Searcher for data science community at University of Bristol
 ### Spacy
 
 - https://spacy.io/models/en
+- https://spacy.io/universe/project/spacy-universal-sentence-encoder
 
 python -m spacy download en_core_web_lg
 python -m spacy download en_core_web_trf
+
 
 ### ScispaCy
 
