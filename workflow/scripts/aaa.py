@@ -64,12 +64,12 @@ def create_pairwise_research(aaa):
         iname = urls[i]
         for j in range(0,num):
             jname = urls[j]
+            # only keep one set of pairs
             if j>i:
                 score = 1-aaa[i][j]
-                # reduce the output of this 
                 # remove same pairs 
                 # filter on score (what value?)
-                if iname != jname and score>0.95: 
+                if score>0.9: 
                     data.append({
                         'url1':iname,
                         'url2':jname,
@@ -207,7 +207,7 @@ def research_aaa():
     create_mean_research_vectors()
     aaa=aaa_vectors(RESEARCH_VECTORS,'research')
     create_pairwise_research(aaa)
-    tsne_research()
+    #tsne_research()
 
 def people_aaa():
     create_mean_people_vectors()
