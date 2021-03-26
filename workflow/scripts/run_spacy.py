@@ -99,7 +99,10 @@ def run_nlp(research_df, noun_data, vector_data):
         sent_num = 0
         for sent in doc.sents:
             #logger.info(sent.text)
-
+            words = [token.text for token in sent]
+            if len(words)<2:
+                logger.info(words)
+                continue
             # create vectors
             # print(doc.vector)
             vector_data.append(
