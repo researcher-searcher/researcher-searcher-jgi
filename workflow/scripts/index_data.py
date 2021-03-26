@@ -34,22 +34,21 @@ def index_vectors():
         df=df, index_name=vector_index_name, text_type='abstract'
     )
 
-    # set boost
-    body = {
-        "indices_boost": [
-            { "title_sentence_vectors": 3.0 },
-            { "abstract_sentence_vectors": 1.0 }
-            ]
-        }
-    boost_index(body=body)
-
 def index_nouns():
-    noun_index_name = "sentence_nouns"
+    noun_index_name = "title_sentence_nouns"
     delete_index(noun_index_name)
-    create_noun_index(index_name=noun_index_name, dim_size=300)
+    create_noun_index(index_name=noun_index_name)
     df = pd.read_csv(f'{args.input}_noun_chunks.tsv.gz',sep='\t')
     index_noun_data(
-        df=df,index_name=noun_index_name
+        df=df,index_name=noun_index_name, text_type='title'
+    )
+
+    noun_index_name = "abstract_sentence_nouns"
+    delete_index(noun_index_name)
+    create_noun_index(index_name=noun_index_name)
+    df = pd.read_csv(f'{args.input}_noun_chunks.tsv.gz',sep='\t')
+    index_noun_data(
+        df=df,index_name=noun_index_name, text_type='abstract'
     )
 
 if __name__ == "__main__":

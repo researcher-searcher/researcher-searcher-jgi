@@ -41,7 +41,7 @@ def create_vector_index(index_name, dim_size):
         logger.info(res)
 
 
-def create_noun_index(index_name, dim_size):
+def create_noun_index(index_name):
     if es.indices.exists(index_name, request_timeout=TIMEOUT):
         print("Index name already exists, please choose another")
     else:
@@ -141,9 +141,10 @@ def index_vector_data(df, index_name, text_type):
         print("counting index timeout", index_name)
 
 def boost_index(body):
+    logger.info(f'Index boost {body}')
     res = es.search(body=body)
 
-def index_noun_data(df, index_name):
+def index_noun_data(df, index_name, text_type):
     print("Indexing data...")
     # create_index(index_name)
     bulk_data = []
@@ -154,33 +155,34 @@ def index_noun_data(df, index_name):
         # with gzip.open(sentence_data) as f:
         # next(f)
         counter += 1
-        if counter % 1000 == 0:
+        if counter % 10000 == 0:
             end = time.time()
             t = round((end - start), 4)
             print(len(bulk_data), t, counter)
-        if counter % chunkSize == 0:
-            deque(
-                helpers.streaming_bulk(
-                    client=es,
-                    actions=bulk_data,
-                    chunk_size=chunkSize,
-                    request_timeout=TIMEOUT,
-                    raise_on_error=True,
-                ),
-                maxlen=0,
-            )
-            bulk_data = []
-        data_dict = {
-            "doc_id": rows["url"],
-            "year": rows["year"],
-            "sent_num": rows["sent_num"],
-            "noun_phrase": rows["noun_phrase"]
-        }
-        op_dict = {
-            "_index": index_name,
-            "_source": data_dict,
-        }
-        bulk_data.append(op_dict)
+        if rows['text_type'] == text_type:
+            if counter % chunkSize == 0:
+                deque(
+                    helpers.streaming_bulk(
+                        client=es,
+                        actions=bulk_data,
+                        chunk_size=chunkSize,
+                        request_timeout=TIMEOUT,
+                        raise_on_error=True,
+                    ),
+                    maxlen=0,
+                )
+                bulk_data = []
+            data_dict = {
+                "doc_id": rows["url"],
+                "year": rows["year"],
+                "sent_num": rows["sent_num"],
+                "noun_phrase": rows["noun_phrase"]
+            }
+            op_dict = {
+                "_index": index_name,
+                "_source": data_dict,
+            }
+            bulk_data.append(op_dict)
     print(len(bulk_data))
     deque(
         helpers.streaming_bulk(
