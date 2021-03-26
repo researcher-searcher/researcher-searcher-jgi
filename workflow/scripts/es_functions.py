@@ -70,7 +70,7 @@ def create_noun_index(index_name, dim_size):
         logger.info(res)
 
 
-def index_vector_data(df, index_name):
+def index_vector_data(df, index_name, text_type):
     print("Indexing data...")
     # create_index(index_name)
     bulk_data = []
@@ -85,37 +85,39 @@ def index_vector_data(df, index_name):
             end = time.time()
             t = round((end - start), 4)
             print(len(bulk_data), t, counter)
-        if counter % chunkSize == 0:
-            deque(
-                helpers.streaming_bulk(
-                    client=es,
-                    actions=bulk_data,
-                    chunk_size=chunkSize,
-                    request_timeout=TIMEOUT,
-                    raise_on_error=True,
-                ),
-                maxlen=0,
-            )
-            bulk_data = []
-        # print(line.decode('utf-8'))
-        if np.count_nonzero(rows["vector"]) == 0:
-            #logger.info(
-            #    f"{rows['url']} {rows['sent_num']} returned empty vector so skipping"
-            #)
-            continue
-        else:
-            data_dict = {
-                "doc_id": rows["url"],
-                "year": rows["year"],
-                "sent_num": rows["sent_num"],
-                "sent_text": rows["sent_text"],
-                "sent_vector": rows["vector"],
-            }
-            op_dict = {
-                "_index": index_name,
-                "_source": data_dict,
-            }
-            bulk_data.append(op_dict)
+        # seprate data into indexes by title/abstract
+        if rows['text_type'] == text_type:
+            if counter % chunkSize == 0:
+                deque(
+                    helpers.streaming_bulk(
+                        client=es,
+                        actions=bulk_data,
+                        chunk_size=chunkSize,
+                        request_timeout=TIMEOUT,
+                        raise_on_error=True,
+                    ),
+                    maxlen=0,
+                )
+                bulk_data = []
+            # print(line.decode('utf-8'))
+            if np.count_nonzero(rows["vector"]) == 0:
+                #logger.info(
+                #    f"{rows['url']} {rows['sent_num']} returned empty vector so skipping"
+                #)
+                continue
+            else:
+                data_dict = {
+                    "doc_id": rows["url"],
+                    "year": rows["year"],
+                    "sent_num": rows["sent_num"],
+                    "sent_text": rows["sent_text"],
+                    "sent_vector": rows["vector"],
+                }
+                op_dict = {
+                    "_index": index_name,
+                    "_source": data_dict,
+                }
+                bulk_data.append(op_dict)
     print(len(bulk_data))
     deque(
         helpers.streaming_bulk(
@@ -137,6 +139,9 @@ def index_vector_data(df, index_name):
         print("Number of records in index", index_name, "=", esRecords)
     except TIMEOUT:
         print("counting index timeout", index_name)
+
+def boost_index(body):
+    res = es.search(body=body)
 
 def index_noun_data(df, index_name):
     print("Indexing data...")

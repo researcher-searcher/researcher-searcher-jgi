@@ -19,12 +19,9 @@ args = parser.parse_args()
 vector_outfile = f"{args.output}_vectors.pkl.gz"
 noun_outfile = f"{args.output}_noun_chunks.tsv.gz"
 
-def create_single_text(row):
-    text = row["title"]
-    if row["abstract"]:
-        text = row["title"] + row["abstract"]
-    return text
-
+nlp = load_spacy_model()
+# do we need to filter stopwords?
+spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 
 def create_texts():
     # Process whole documents
@@ -57,33 +54,33 @@ def create_texts():
 
     # create single string of text
     # maybe just leave titles and abstract separate if treating each sentence separately
-    textList = []
-    for i, rows in research_df.iterrows():
-        if not type(rows["abstract"]) == float:
-            textList.append(f"{rows['title']} {rows['abstract']}")
-        else:
-            textList.append(rows["title"])
-    research_df["text"] = textList
+    #textList = []
+    #for i, rows in research_df.iterrows():
+    #    if not type(rows["abstract"]) == float:
+    #        textList.append(f"{rows['title']} {rows['abstract']}")
+    #    else:
+    #        textList.append(rows["title"])
+    #research_df["text"] = textList
+
     #logger.debug(research_df.head())
     logger.info(f'Found {len(noun_data)} noun entries')
     logger.info(f'Found {len(vector_data)} vector entries')
     logger.info(f'Parsing data from {research_df.shape[0]} records')
+    logger.info(f'\n{research_df.head()}')
     #research_df=research_df[research_df['url']=='https://research-information.bris.ac.uk/en/publications/long-time-scale-gpu-dynamics-reveal-the-mechanism-of-drug-resista']
     return research_df, noun_data, vector_data
 
-
-def run_nlp(research_df, noun_data, vector_data):
+def run_nlp(research_df, noun_data, vector_data, text_type):
+    logger.info(research_df.head())
+    logger.info(len(noun_data))
+    logger.info(len(vector_data))
     if research_df.empty:
         logger.info("No new data")
         mark_as_complete(args.output)
         exit()
 
-    nlp = load_spacy_model()
-    # do we need to filter stopwords?
-    spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
-
-    logger.info('Running NLP on docs...')
-    text = list(research_df["text"])
+    logger.info('Running NLP on docs...')    
+    text = research_df[text_type].dropna().unique().tolist()
     docs = list(nlp.pipe(text))
     logger.info(f'Created {len(docs)} NLP objects')
 
@@ -108,6 +105,7 @@ def run_nlp(research_df, noun_data, vector_data):
                     {
                         "url": df_row["url"],
                         "year": df_row["year"],
+                        "text_type": text_type,
                         "sent_num": sent_num,
                         "sent_text": sent.text,
                         "vector": list(sent.vector),
@@ -135,22 +133,18 @@ def run_nlp(research_df, noun_data, vector_data):
                                 {
                                     "url": df_row["url"], 
                                     "year": df_row["year"], 
+                                    "text_type": text_type,
                                     "sent_num": sent_num, 
                                     "noun_phrase": chunk
                                     }
                             )
-            #logger.info(
-            #    f"Verbs: {[token.lemma_ for token in sent if token.pos_ == 'VERB']}"
-            #)
-            # logger.debug(f"All: {[token.lemma_ for token in doc]}")
-
-            # Find named entities, phrases and concepts - can use
-            #for entity in sent.ents:
-            #    logger.debug(
-            #    )
-            #        f"entity: {entity} #entity.text: {entity.text} entity.label_:{entity.label_}"
             sent_num += 1
+    return noun_data,vector_data
 
+if __name__ == "__main__":
+    research_df, noun_data, vector_data = create_texts()
+    noun_data, vector_data = run_nlp(research_df, noun_data, vector_data, 'title')
+    noun_data, vector_data = run_nlp(research_df, noun_data, vector_data, 'abstract')
     # logger.info(data)
     df = pd.DataFrame(noun_data)
     df.dropna(inplace=True)
@@ -162,7 +156,3 @@ def run_nlp(research_df, noun_data, vector_data):
     df.to_pickle(vector_outfile)
 
     mark_as_complete(args.output)
-
-if __name__ == "__main__":
-    research_df, noun_data, vector_data = create_texts()
-    run_nlp(research_df, noun_data, vector_data)

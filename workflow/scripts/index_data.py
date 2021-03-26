@@ -8,6 +8,7 @@ from workflow.scripts.es_functions import (
     delete_index,
     index_vector_data,
     index_noun_data,
+    boost_index
 )
 
 parser = ArgumentParser()
@@ -18,13 +19,29 @@ args = parser.parse_args()
 
 
 def index_vectors():
-    vector_index_name = "sentence_vectors"
+    vector_index_name = "title_sentence_vectors"
     delete_index(vector_index_name)
     create_vector_index(index_name=vector_index_name, dim_size=300)
     df = pd.read_pickle(f"{args.input}_vectors.pkl.gz")
     index_vector_data(
-        df=df, index_name=vector_index_name
+        df=df, index_name=vector_index_name, text_type='title'
     )
+    vector_index_name = "abstract_sentence_vectors"
+    delete_index(vector_index_name)
+    create_vector_index(index_name=vector_index_name, dim_size=300)
+    df = pd.read_pickle(f"{args.input}_vectors.pkl.gz")
+    index_vector_data(
+        df=df, index_name=vector_index_name, text_type='abstract'
+    )
+
+    # set boost
+    body = {
+        "indices_boost": [
+            { "title_sentence_vectors": 3.0 },
+            { "abstract_sentence_vectors": 1.0 }
+            ]
+        }
+    boost_index(body=body)
 
 def index_nouns():
     noun_index_name = "sentence_nouns"
