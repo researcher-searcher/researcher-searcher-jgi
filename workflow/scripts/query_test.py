@@ -64,7 +64,7 @@ def q1(text):
         sent_vec = sent.vector
         res = vector_query(index_name=vector_index_name, query_vector=sent_vec)
         if res:
-            for r in res:
+            for r in res[:10]:
                 if r["score"] > 0.5:
                     logger.info(f'full sent {r}')
 
@@ -81,7 +81,7 @@ def q1(text):
             ):
                 # not sure if should filter on number of words in chunk?
                 # might work better here to avoid ambiguous single words, e.g. funding, background...
-                if len(chunk) > 1:
+                if len(chunk) > 0:
                     logger.info(f"noun chunk: {chunk} {len(chunk)}")
                     noun_chunk_string+=str(chunk)+' '
         logger.info(noun_chunk_string)
@@ -89,7 +89,7 @@ def q1(text):
             chunk_vec = nlp(noun_chunk_string).vector
             res = vector_query(index_name=vector_index_name, query_vector=chunk_vec)
             if res:
-                for r in res:
+                for r in res[:10]:
                     if r["score"] > 0.5:
                         logger.info(f'chunk {r}')
 
@@ -162,5 +162,5 @@ def q4(text):
 #q2()
 #q3()
 text = 'military health'
-text = 'Text to - speech/ speech - to -text'
-q4(text)
+#text = 'Text to speech / speech to text'
+q1(text)

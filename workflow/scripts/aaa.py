@@ -53,11 +53,16 @@ def create_pairwise_research(aaa):
         iname = urls[i]
         for j in range(0,num):
             jname = urls[j]
-            data.append({
-                'url1':iname,
-                'url2':jname,
-                'score': 1-aaa[i][j]
-            })
+            score = 1-aaa[i][j]
+            # reduce the output of this 
+            # remove same pairs 
+            # filter on score (what value?)
+            if iname != jname and score>0.9: 
+                data.append({
+                    'url1':iname,
+                    'url2':jname,
+                    'score': 1-aaa[i][j]
+                })
     df = pd.DataFrame(data)
     df.drop_duplicates(subset=['url1','url2'],inplace=True)
     logger.info(f'Writing {RESEARCH_PAIRS}')
@@ -128,11 +133,11 @@ def altair_scatter_plot(source):
     chart = alt.Chart(source).mark_point().encode(
         x='x',
         y='y',
-        color='academic-school-name',
-        shape='academic-school-name',
-        tooltip=['email', 'academic-school-name'],
+        color='org-name',
+        shape='org-name',
+        tooltip=['email', 'org-name'],
     ).interactive()
-    chart.save('workflow/results/chart.html',scale_factor=10.0)
+    chart.save('workflow/results/altair.html',scale_factor=10.0)
 
 def plotly_scatter_plot(df):
     #import plotly.graph_objects as go
@@ -196,5 +201,6 @@ def people_aaa():
     aaa=aaa_vectors(PEOPLE_VECTORS)
     create_pairwise_people(aaa)
     tsne_people()
-    
+
+research_aaa()    
 people_aaa()

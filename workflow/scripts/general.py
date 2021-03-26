@@ -30,23 +30,23 @@ def load_spacy_model():
     return nlp
 
 def create_aaa_distances(vectors=[]):
-    print('Creating distances...')
+    logger.info('Creating distances...')
     #https://stackoverflow.com/questions/48838346/how-to-speed-up-computation-of-cosine-similarity-between-set-of-vectors
 
-    print(len(vectors))
+    logger.info(len(vectors))
     data = np.array(vectors)
     pws = distance.pdist(data, metric='cosine')
     #return as square-form distance matrix
     pws = distance.squareform(pws)
-    print(len(pws))
+    logger.info(len(pws))
     return pws
 
 #takes an array of vectors
 def create_pair_distances(v1=[],v2=[]):
-    print('Creating distances...')
+    logger.info('Creating distances...')
     #https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html#scipy.spatial.distance.cdist
 
-    print(len(v1),len(v2))
+    logger.info(f'{len(v1)} {len(v2)}')
     y = distance.cdist(v1, v2, 'cosine')
-    print(len(y))
+    logger.info(len(y))
     return y

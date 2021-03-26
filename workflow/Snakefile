@@ -72,6 +72,14 @@ rule index_data:
         python -m workflow.scripts.index_data --input {input} --output {output}
         """
 
+rule aaa:
+    input: INDEX_DATA
+    output: 'workflow/results/people_vector_pairs.pkl.gz'
+    shell:
+        """
+        python -m workflow.scripts.aaa
+        """
+
 rule clean_for_build:
     shell:
         """
