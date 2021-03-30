@@ -72,6 +72,10 @@ def create_texts():
 
 def run_nlp(research_df, noun_data, vector_data, text_type):
     logger.info(research_df.head())
+    # research_df needs to be same shape as list passed to nlp!
+    research_df.dropna(subset=[text_type],inplace=True)
+    #research_df.drop_duplicates(subset=[text_type],inplace=True)
+    logger.info(research_df.shape)
     logger.info(len(noun_data))
     logger.info(len(vector_data))
     if research_df.empty:
@@ -79,10 +83,14 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
         mark_as_complete(args.output)
         exit()
 
-    logger.info('Running NLP on docs...')    
-    text = research_df[text_type].dropna().unique().tolist()
+    logger.info(f'Running NLP on docs: {text_type}...')    
+    text = research_df[text_type].dropna().tolist()
     docs = list(nlp.pipe(text))
     logger.info(f'Created {len(docs)} NLP objects')
+
+    if len(docs)!=research_df.shape[0]:
+        logger.warning('Different number of NLP docs!')
+        return
 
     for i in range(0, len(docs)):
         doc = docs[i]
