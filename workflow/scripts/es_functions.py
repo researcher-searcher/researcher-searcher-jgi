@@ -2,14 +2,24 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from collections import deque
 from loguru import logger
+from environs import Env
 import numpy as np
 import time
 import pandas as pd
 
+env = Env()
+env.read_env()
+
+ES_HOST = env.str("ELASTIC_HOST")
+ES_PORT = env.str("ELASTIC_PORT")
+ES_USER = env.str("ELASTIC_USER")
+ES_PASSWORD = env.str("ELASTIC_PASSWORD")
 
 TIMEOUT = 300
 chunkSize = 10000
-es = Elasticsearch(["localhost:9200"], timeout=TIMEOUT)
+#es = Elasticsearch(["localhost:9200"], timeout=TIMEOUT)
+es = Elasticsearch([f'{ES_HOST}:{ES_PORT}'], http_auth=(ES_USER, ES_PASSWORD), timeout=TIMEOUT)
+
 
 
 def create_vector_index(index_name, dim_size):
