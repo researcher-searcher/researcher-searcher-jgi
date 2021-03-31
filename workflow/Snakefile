@@ -14,6 +14,7 @@ RESEARCH_DATA = f'{OUTDIR}research_data'
 RESEARCH_METADATA = f'{OUTDIR}research_metadata'
 TEXT_DATA = f'{OUTDIR}text_data'
 INDEX_DATA = f'{OUTDIR}index_data'
+DONE = f'{OUTDIR}done'
 
 rule find_person:
     input: config['emails']
@@ -64,21 +65,22 @@ rule parse_text:
         python -m workflow.scripts.run_spacy --input {input} --output {output}
         """
 
-rule index_data:
+rule aaa:
     input: TEXT_DATA
     output: INDEX_DATA
+    shell:
+        """
+        python -m workflow.scripts.aaa --input {input} --output {output}
+        """
+
+rule index_data:
+    input: INDEX_DATA
+    output: DONE
     shell:
         """
         python -m workflow.scripts.index_data --input {input} --output {output}
         """
 
-rule aaa:
-    input: INDEX_DATA
-    output: 'workflow/results/people_vector_pairs.pkl.gz'
-    shell:
-        """
-        python -m workflow.scripts.aaa
-        """
 
 rule clean_for_build:
     shell:

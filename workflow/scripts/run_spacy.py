@@ -16,8 +16,8 @@ parser.add_argument("--input", type=str, help="Input file prefix")
 parser.add_argument("--output", type=str, help="Output file prefix")
 args = parser.parse_args()
 
-vector_outfile = f"{args.output}_vectors.pkl.gz"
-noun_outfile = f"{args.output}_noun_chunks.tsv.gz"
+vector_outfile = "workflow/results/text_data_vectors.pkl.gz"
+noun_outfile = "workflow/results/text_data_noun_chunks.tsv.gz"
 
 nlp = load_spacy_model()
 # do we need to filter stopwords?

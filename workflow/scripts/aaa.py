@@ -7,6 +7,7 @@ import altair as alt
 import matplotlib.pyplot as plt
 import os
 from loguru import logger
+from simple_parsing import ArgumentParser
 from sklearn.manifold import TSNE
 from workflow.scripts.es_functions import vector_query, standard_query
 from workflow.scripts.general import load_spacy_model, create_aaa_distances
@@ -21,6 +22,12 @@ RESEARCH_PAIRS = 'workflow/results/research_vector_pairs.pkl.gz'
 PEOPLE_PAIRS = 'workflow/results/people_vector_pairs.pkl.gz'
 
 tSNE=TSNE(n_components=2)
+
+parser = ArgumentParser()
+
+parser.add_argument("--input", type=str, help="Input file prefix")
+parser.add_argument("--output", type=str, help="Output file prefix")
+args = parser.parse_args()
 
 def create_mean_research_vectors():
     if os.path.exists(RESEARCH_VECTORS):
@@ -215,5 +222,7 @@ def people_aaa():
     create_pairwise_people(aaa)
     tsne_people()
 
-research_aaa()    
-people_aaa()
+if __name__ == "__main__":
+    research_aaa()    
+    people_aaa()
+    mark_as_complete(args.output)
