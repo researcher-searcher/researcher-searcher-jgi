@@ -2,19 +2,39 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from loguru import logger
 
-corpus = pd.read_csv("workflow/results/text_data_noun_chunks.tsv.gz",sep='\t',nrows=1000)
+corpus = pd.read_csv("workflow/results/text_data_noun_chunks.tsv.gz",sep='\t')
 logger.info(corpus.head())
+#logger.debug(corpus['noun_phrase'])
+
+def dummy_fun(doc):
+    return doc
+
+docs = [
+    ['Two dogs', 'wrongs', 'don\'t', 'make', 'a', 'right', '.'],
+    ['The', 'pen', 'is', 'mightier', 'than', 'the', 'sword'],
+    ['Don\'t', 'put', 'all', 'your', 'eggs', 'in', 'one', 'basket', '.']
+]
 
 def vectorize_corpus(corpus):
-    vectorizer = TfidfVectorizer()
-    tfs = vectorizer.fit_transform(corpus['noun_phrase'])
-    logger.info(vectorizer.get_feature_names())
-    return vectorizer, tfs
+    vectorizer = TfidfVectorizer(
+        analyzer = 'word',
+        tokenizer=dummy_fun,
+        preprocessor=dummy_fun,
+        token_pattern=None
+        )
+    # create list of lists
+    corpus_data = []
+    for i in list(corpus['noun_phrase']):
+        corpus_data.append([i])
+    vectorizer.fit_transform(corpus_data)
+    #logger.info(vectorizer.get_feature_names())
+    return vectorizer
 
-def tfidf_doc(tfidf='',text=''):
-    text=text.lower()
+def tfidf_doc(tfidf='',text=[]):
+    #text=text.lower()
     #transform function transforms a document to document-term matrix
     response = tfidf.transform([text])
+    print(response)
 
     #get the feature name from the model
     feature_names = tfidf.get_feature_names()
@@ -26,7 +46,7 @@ def tfidf_doc(tfidf='',text=''):
     return sorted_res
 
 if __name__ == "__main__":
-    vectorizer, tfs = vectorize_corpus(corpus)
-    testText = 'earlier early eastern eating eating eating eccentric education educational'
+    vectorizer = vectorize_corpus(corpus)
+    testText = ['knee osteoarthritis','machine learning','vitamin']
     sorted_res = tfidf_doc(tfidf=vectorizer,text=testText)
     logger.info(sorted_res)
