@@ -10,12 +10,6 @@ logger.info(corpus.head())
 def dummy_fun(doc):
     return doc
 
-docs = [
-    ['Two dogs', 'wrongs', 'don\'t', 'make', 'a', 'right', '.'],
-    ['The', 'pen', 'is', 'mightier', 'than', 'the', 'sword'],
-    ['Don\'t', 'put', 'all', 'your', 'eggs', 'in', 'one', 'basket', '.']
-]
-
 def vectorize_corpus(corpus):
     vectorizer = TfidfVectorizer(
         analyzer = 'word',
@@ -32,10 +26,8 @@ def vectorize_corpus(corpus):
     return vectorizer
 
 def tfidf_doc(tfidf='',text=[]):
-    #text=text.lower()
     #transform function transforms a document to document-term matrix
     response = tfidf.transform([text])
-    print(response)
 
     #get the feature name from the model
     feature_names = tfidf.get_feature_names()
@@ -49,13 +41,35 @@ def tfidf_doc(tfidf='',text=[]):
 
 def person_to_output():
     logger.info('Getting person to output data...')
+    rm_df = pd.read_csv("workflow/results/research_metadata.tsv.gz",sep='\t')
+    logger.info(rm_df.shape)
+    noun_df = pd.read_csv("workflow/results/text_data_noun_chunks.tsv.gz",sep='\t')
+    logger.info(noun_df.shape)
+    m = rm_df.merge(noun_df,left_on="url",right_on="url")[['email','noun_phrase']]
+    m['noun_phrase'] = m['noun_phrase'].str.lower()
+    logger.info(m.shape)
+    logger.info(m.head())
+    grouped = m.groupby('email')['noun_phrase'].apply(list).reset_index(name = 'noun_list')
+    return grouped
 
-if __name__ == "__main__":
+def run():
     vectorizer = vectorize_corpus(corpus)
     feature_names = vectorizer.get_feature_names()
     df = pd.DataFrame(feature_names)
     logger.info(df.head())
-    df.to_csv("workflow/results/noun_chunks.tsv.gz",index=False,header=False)
-    testText = ['knee osteoarthritis','machine learning','vitamin']
-    sorted_res = tfidf_doc(tfidf=vectorizer,text=testText)
-    logger.info(sorted_res)
+    df.to_csv("workflow/results/noun_chunks.tsv.gz",index=False,header=['email'])
+    person_noun_chunks = person_to_output()
+    logger.info(person_noun_chunks)
+    res = []
+    for i,row in person_noun_chunks.iterrows():
+        logger.info(f"{i} {row['email']}")
+        sorted_res = tfidf_doc(tfidf=vectorizer,text=row['noun_list'])
+        #logger.info(sorted_res)
+        for i in sorted_res[:100]:
+            res.append({'email':row['email'],'noun_chunk':i[0],'score':i[1]})
+    #logger.info(res)
+    df = pd.DataFrame(res)
+    df.to_csv("workflow/results/noun_chunks_tfidf.tsv.gz",sep='\t')
+
+if __name__ == "__main__":
+    run()
