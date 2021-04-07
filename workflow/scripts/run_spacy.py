@@ -122,6 +122,8 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
 
                 # Analyze syntax
                 for chunk in sent.noun_chunks:
+                    # deal with newline and spaces
+                    chunk = chunk.strip().replace('\n',' ')
                     # logger.debug(chunk)
                     # remove stopwords and things
                     if (
