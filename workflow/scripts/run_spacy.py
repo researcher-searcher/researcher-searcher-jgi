@@ -122,8 +122,6 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
 
                 # Analyze syntax
                 for chunk in sent.noun_chunks:
-                    # deal with newline and spaces
-                    chunk = chunk.strip().replace('\n',' ')
                     # logger.debug(chunk)
                     # remove stopwords and things
                     if (
@@ -145,7 +143,7 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
                                     "year": df_row["year"], 
                                     "text_type": text_type,
                                     "sent_num": sent_num, 
-                                    "noun_phrase": chunk
+                                    "noun_phrase": str(chunk).strip().replace('\n',' ')
                                     }
                             )
             sent_num += 1
