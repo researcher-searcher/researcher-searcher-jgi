@@ -19,7 +19,7 @@ args = parser.parse_args()
 vector_outfile = "workflow/results/text_data_vectors.pkl.gz"
 noun_outfile = "workflow/results/text_data_noun_chunks.tsv.gz"
 
-nlp = load_spacy_model()
+nlp_web,nlp_use = load_spacy_model()
 # do we need to filter stopwords?
 spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 
@@ -70,14 +70,10 @@ def create_texts():
     #research_df=research_df[research_df['url']=='https://research-information.bris.ac.uk/en/publications/long-time-scale-gpu-dynamics-reveal-the-mechanism-of-drug-resista']
     return research_df, noun_data, vector_data
 
-def run_nlp(research_df, noun_data, vector_data, text_type):
-    logger.info(research_df.head())
+def create_vectors(research_df, vector_data, text_type):
     # research_df needs to be same shape as list passed to nlp!
     research_df.dropna(subset=[text_type],inplace=True)
     #research_df.drop_duplicates(subset=[text_type],inplace=True)
-    logger.info(research_df.shape)
-    logger.info(len(noun_data))
-    logger.info(len(vector_data))
     if research_df.empty:
         logger.info("No new data")
         mark_as_complete(args.output)
@@ -85,13 +81,13 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
 
     logger.info(f'Running NLP on docs: {text_type}...')    
     text = research_df[text_type].dropna().tolist()
-    docs = list(nlp.pipe(text))
+    docs = list(nlp_use.pipe(text))
     logger.info(f'Created {len(docs)} NLP objects')
 
     if len(docs)!=research_df.shape[0]:
         logger.warning('Different number of NLP docs!')
         return
-
+    
     for i in range(0, len(docs)):
         doc = docs[i]
         #logger.info(doc)
@@ -119,7 +115,46 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
                         "vector": list(sent.vector),
                     }
                 )
+            sent_num += 1
+    return vector_data
 
+
+def create_noun_chunks(research_df, noun_data, text_type):
+    logger.info(research_df.head())
+    # research_df needs to be same shape as list passed to nlp!
+    research_df.dropna(subset=[text_type],inplace=True)
+    #research_df.drop_duplicates(subset=[text_type],inplace=True)
+    logger.info(research_df.shape)
+    logger.info(len(noun_data))
+    if research_df.empty:
+        logger.info("No new data")
+        mark_as_complete(args.output)
+        return
+
+    logger.info(f'Running NLP on docs: {text_type}...')    
+    text = research_df[text_type].dropna().tolist()
+    docs = list(nlp_web.pipe(text))
+    logger.info(f'Created {len(docs)} NLP objects')
+
+    if len(docs)!=research_df.shape[0]:
+        logger.warning('Different number of NLP docs!')
+        return
+
+    for i in range(0, len(docs)):
+        doc = docs[i]
+        #logger.info(doc)
+        df_row = research_df.iloc[i]
+        if i % 1000 == 0:
+            logger.info(f"{i} {len(docs)}")
+
+        # logger.info(tokens)
+        assert doc.has_annotation("SENT_START")
+        sent_num = 0
+        for sent in doc.sents:
+            #logger.info(sent.text)
+            words = [token.text for token in sent]
+            if len(words)>2:
+                
                 # Analyze syntax
                 for chunk in sent.noun_chunks:
                     # logger.debug(chunk)
@@ -147,12 +182,14 @@ def run_nlp(research_df, noun_data, vector_data, text_type):
                                     }
                             )
             sent_num += 1
-    return noun_data,vector_data
+    return noun_data
 
 if __name__ == "__main__":
     research_df, noun_data, vector_data = create_texts()
-    noun_data, vector_data = run_nlp(research_df, noun_data, vector_data, 'title')
-    noun_data, vector_data = run_nlp(research_df, noun_data, vector_data, 'abstract')
+    noun_data = create_noun_chunks(research_df, noun_data, 'title')
+    vector_data = create_vectors(research_df, vector_data, 'title')
+    noun_data = create_noun_chunks(research_df, noun_data, 'abstract')
+    vector_data = create_vectors(research_df, vector_data, 'abstract')
     # logger.info(data)
     df = pd.DataFrame(noun_data)
     df.dropna(inplace=True)

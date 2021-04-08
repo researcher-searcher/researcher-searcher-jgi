@@ -2,6 +2,7 @@ import scispacy
 import spacy
 import numpy as np
 from scipy.spatial import distance
+import spacy_universal_sentence_encoder
 from loguru import logger
 
 
@@ -16,7 +17,9 @@ def load_spacy_model():
     model_name = "en_core_web_lg"
     # Load English tokenizer, tagger, parser and NER
     logger.info(f"Loading spacy model {model_name}")
-    nlp = spacy.load(model_name)
+    nlp_web = spacy.load(model_name)
+    logger.info(f"Loading spacy model en_use_lg")
+    nlp_use = spacy_universal_sentence_encoder.load_model('en_use_lg')
     # nlp = spacy.load("en_core_sci_scibert")
     # nlp = spacy.load("en_core_sci_lg")
     # nlp = spacy.load("en_ner_bionlp13cg_md")
@@ -27,7 +30,7 @@ def load_spacy_model():
     #    nlp.max_length = 512
     #nlp.max_length=10000
     logger.info("Done...")
-    return nlp
+    return nlp_web,nlp_use
 
 def create_aaa_distances(vectors=[]):
     logger.info('Creating distances...')

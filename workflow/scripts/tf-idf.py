@@ -57,7 +57,7 @@ def run():
     feature_names = vectorizer.get_feature_names()
     df = pd.DataFrame(feature_names)
     logger.info(df.head())
-    df.to_csv("workflow/results/noun_chunks.tsv.gz",index=False,header=['email'])
+    df.to_csv("workflow/results/noun_chunks.tsv.gz",index=False,header=['noun_chunk'])
     person_noun_chunks = person_to_output()
     logger.info(person_noun_chunks)
     res = []
@@ -69,7 +69,7 @@ def run():
             res.append({'email':row['email'],'noun_chunk':i[0],'score':i[1]})
     #logger.info(res)
     df = pd.DataFrame(res)
-    df.to_csv("workflow/results/noun_chunks_tfidf.tsv.gz",sep='\t')
+    df.to_csv("workflow/results/noun_chunks_tfidf.tsv.gz",sep='\t',index=False)
 
 if __name__ == "__main__":
     run()
