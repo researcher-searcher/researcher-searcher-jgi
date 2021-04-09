@@ -13,6 +13,8 @@ from workflow.scripts.es_functions import (
     boost_index
 )
 
+dim_size=512
+
 parser = ArgumentParser()
 
 parser.add_argument("--input", type=str, help="Input file prefix")
@@ -25,39 +27,39 @@ people_vector = "workflow/results/people_vectors.pkl.gz"
 research_vector = "workflow/results/research_vectors.pkl.gz"
 
 def index_vectors():
-    vector_index_name = "title_sentence_vectors"
+    vector_index_name = "use_title_sentence_vectors"
     delete_index(vector_index_name)
-    create_vector_index(index_name=vector_index_name, dim_size=300)
+    create_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(vector_outfile)
     index_vector_data(
         df=df, index_name=vector_index_name, text_type='title'
     )
-    vector_index_name = "abstract_sentence_vectors"
+    vector_index_name = "use_abstract_sentence_vectors"
     delete_index(vector_index_name)
-    create_vector_index(index_name=vector_index_name, dim_size=300)
+    create_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(vector_outfile)
     index_vector_data(
         df=df, index_name=vector_index_name, text_type='abstract'
     )
 
 def index_mean_vectors():
-    vector_index_name = "person_vectors"
+    vector_index_name = "use_person_vectors"
     delete_index(vector_index_name)
-    create_mean_vector_index(index_name=vector_index_name, dim_size=300)
+    create_mean_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(people_vector)
     index_mean_vector_data(
         df=df, index_name=vector_index_name, id_field='email'
     )
-    vector_index_name = "output_vectors"
+    vector_index_name = "use_output_vectors"
     delete_index(vector_index_name)
-    create_mean_vector_index(index_name=vector_index_name, dim_size=300)
+    create_mean_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(research_vector)
     index_mean_vector_data(
         df=df, index_name=vector_index_name, id_field='url'
     )
 
 def index_nouns():
-    noun_index_name = "title_sentence_nouns"
+    noun_index_name = "use_title_sentence_nouns"
     delete_index(noun_index_name)
     create_noun_index(index_name=noun_index_name)
     df = pd.read_csv(noun_outfile,sep='\t')
@@ -65,7 +67,7 @@ def index_nouns():
         df=df,index_name=noun_index_name, text_type='title'
     )
 
-    noun_index_name = "abstract_sentence_nouns"
+    noun_index_name = "use_abstract_sentence_nouns"
     delete_index(noun_index_name)
     create_noun_index(index_name=noun_index_name)
     df = pd.read_csv(noun_outfile,sep='\t')

@@ -10,7 +10,7 @@ from loguru import logger
 from simple_parsing import ArgumentParser
 from sklearn.manifold import TSNE
 from workflow.scripts.es_functions import vector_query, standard_query
-from workflow.scripts.general import load_spacy_model, create_aaa_distances
+from workflow.scripts.general import load_spacy_model, create_aaa_distances, mark_as_complete
 
 PEOPLE_DATA = 'workflow/results/person_data.tsv.gz'
 PERSON_METADATA = 'workflow/results/person_metadata.tsv.gz'
