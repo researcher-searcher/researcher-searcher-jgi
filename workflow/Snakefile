@@ -65,12 +65,13 @@ rule parse_text:
         python -m workflow.scripts.run_spacy --input {input} --output {output}
         """
 
-rule aaa:
+rule process_text:
     input: TEXT_DATA
     output: INDEX_DATA
     shell:
         """
         python -m workflow.scripts.aaa --input {input} --output {output}
+        python -m workflow.scripts.tf-idf 
         """
 
 rule index_data:
