@@ -168,4 +168,4 @@ Currently, three end points
 3. collaboration
   - return most similar person (with/without shared publications)
  
-https://bdsn-api.mrcieu.ac.uk/
+API - https://bdsn-api.mrcieu.ac.uk/
