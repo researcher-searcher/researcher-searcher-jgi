@@ -85,9 +85,22 @@ Aims:
 - Currently using [Spacy noun chunks](https://spacy.io/usage/linguistic-features#noun-chunks) then running tf-idf via sklearn
 
 #### Vectors
-- Again, many options. Depends on downstream requirements. 
+- Again, many options, partially depends on downstream requirements. 
 - Tried Spacy vectors but sentences are just averages of words (https://spacy.io/usage/linguistic-features#similarity-expectations)
   - "The similarity of Doc and Span objects defaults to the average of the token vectors. This means that the vector for “fast food” is the average of the vectors for “fast” and “food”, which isn’t necessarily representative of the phrase “fast food”."
+- Currently using Google Universal Sentence Embedding via spacy (https://spacy.io/universe/project/spacy-universal-sentence-encoder)
+  - not convinced this is better for single words.... 
+- Currently creating a vector for every sentence in every title and abstract
 
 `snakemake -r parse_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
+
+#### Calculating distances
+
+Once we have vectors for every sentence we can create distances between publications and people.
+- create mean sentence vectors
+
+`snakemake -r aaa -j 1`
+- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
+
+Example of how this can be visualised - `output/plotly.html`
