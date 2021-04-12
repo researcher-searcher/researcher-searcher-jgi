@@ -125,7 +125,7 @@ Currently Elasticsearch indexes are created and populated within this repo, but 
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L76
 
 Method:
-- create indexes for sentence title and abstract vectors
+- create indexes for sentence title and abstract vectors (https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html)
   - also include full text indexing (https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
 - Create indexes for sentence title and abstract noun_chunks
   - not using at the moment
