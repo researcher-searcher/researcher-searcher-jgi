@@ -185,10 +185,10 @@ Using FastAPI docker image as starting point - https://fastapi.tiangolo.com/depl
 
 Currently, three end points
 1. text search (top 100)
-  - return person via sentence vectors 
-  - return person via full text 
-  - return person via person vectors
-  - return publication via publication vectors
+  - a) return person via sentence vectors 
+  - b) return person via full text 
+  - c) return person via person vectors
+  - d) return publication via publication vectors
 2. person
   - return top x noun chunks for a given person
 3. collaboration
@@ -196,14 +196,17 @@ Currently, three end points
 
 ### Details
 
+
 How to return a person or persons based on sentence matches?
 - reason this might be useful is matching multiple people to a section of text, e.g. multiple sentences
 
-Current method:
-- create list of scores (either full text or cosine)
-- create weight for each score based on return order, e.g. 100 hits, top hit has weight 100
-- square the weight to reduce effect of many hits for one person, some being low scores
-- create weighted average
+For 1a and 1b:
+- text query is transformed via spacy `nlp()`
+- for each sentence in nlp object: 
+  - create list of scores (either full text or cosine)
+  - create weight for each score based on return order, e.g. 100 hits, top hit has weight 100
+  - square the weight to reduce effect of many hits for one person, some being low scores
+  - create weighted average
 
 Issues, people who mention a short phrase, e.g. machine learning, just once may be returned ahead of those who have mentioned it many times.
 
