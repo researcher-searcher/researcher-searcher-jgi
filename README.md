@@ -12,7 +12,7 @@ Researcher Searcher for data science community at University of Bristol
 - Data Processing
 - Search (needs to move to separete repo)
 - Graph (https://github.com/elswob/researcher-searcher-graph)
-- Search methods (https://github.com/elswob/researcher-searcher-api)
+- API (https://github.com/elswob/researcher-searcher-api)
 
 ## Data sources
 
@@ -146,7 +146,25 @@ Currently Elasticsearch indexes are created and populated within this repo, but 
 
 ## Graph
 
-Make use of [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
+Using our [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
+- defined schemas
+- pre and post build tests
 
 ![graph schema](https://github.com/elswob/researcher-searcher-jgi/blob/main/output/graph.png?raw=true)
 
+## API
+
+Using FastAPI docker image as starting point - https://fastapi.tiangolo.com/deployment/docker/
+- modify to different version of FastAPI due to issues with Universal Sentence Encoder requirements
+
+Currently, three end points
+1. text search
+  - return person via sentence vectors
+  - return person via full text 
+  - return person via person vectors
+  - return publication via publication vectors
+2. person
+  - return top x noun chunks for a given person
+3. collaboration
+  - return most similar person (with/without shared publications)
+ 
