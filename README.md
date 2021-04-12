@@ -157,6 +157,8 @@ Using our [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
 Using FastAPI docker image as starting point - https://fastapi.tiangolo.com/deployment/docker/
 - modify to different version of FastAPI due to issues with Universal Sentence Encoder requirements
 
+### Overview
+
 Currently, three end points
 1. text search (top 100)
   - return person via sentence vectors 
@@ -167,5 +169,19 @@ Currently, three end points
   - return top x noun chunks for a given person
 3. collaboration
   - return most similar person (with/without shared publications)
+
+### Details
+
+How to return a person or persons based on sentence matches?
+- reason this might be useful is matching multiple people to a section of text, e.g. multiple sentences
+
+Current method:
+- create list of scores (either full text or cosine)
+- create weighted average 
+- square it
+
+Issues, people who mention a short phrase, e.g. machine learning, just once may be returned ahead of those who have mentioned it many times.
+
+### Location 
  
 API - https://bdsn-api.mrcieu.ac.uk/
