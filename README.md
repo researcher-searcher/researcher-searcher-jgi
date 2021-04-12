@@ -24,6 +24,34 @@ Researcher Searcher for data science community at University of Bristol
 - all information scraping done using BeautifulSoup (https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 - new structure of research pages makes this quite straight forward, e.g. specific class names for each attribute
 
+### Example
+
+```
+def uob_finder_web(email):
+    logger.debug(f"Searching for {email}")
+    url = f"https://research-information.bris.ac.uk/en/searchAll/advanced/?exactPhrase={email}&or=&minus=&family=persons&doSearch=Search&slowScroll=true&resultFamilyTabToSelect="
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, "html.parser")
+    people_data = soup.find_all("li", class_="grid-result-item")
+    person_info = False
+    for p in people_data:
+        find_person = p.find_all("a", class_="link person")
+        # logger.debug(p)
+        e = p.find("span", text=re.compile(email, re.IGNORECASE))
+        if e:
+            logger.debug(f"{find_person} {e}")
+            person_page = find_person[0]["href"]
+            # get name
+            # m = re.match()
+            name = find_person[0].getText()
+            logger.debug(person_page)
+            person_info = {"page": person_page, "name": name, "email": email}
+    if person_info == False:
+        logger.debug("No page found")
+        person_info = {"page": "NA", "name": "NA", "email": email}
+    return person_info
+```
+
 ## Information extraction
 
 Really just looking for basic info for a set of people, organisations and publications, and the connections between them.
