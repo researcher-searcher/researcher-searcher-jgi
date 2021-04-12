@@ -36,6 +36,7 @@ For each email address:
 - capture person info and page
 - e.g. https://research-information.bris.ac.uk/en/searchAll/index/?search=ben+elsworth&pageSize=25&showAdvanced=false&allConcepts=true&inferConcepts=true&searchBy=PartOfNameOrTitle
 
+#### Run
 `snakemake -r find_person -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L19
 - issues with wrong email addresses, required some manual searching to match people to home page
@@ -51,6 +52,7 @@ For each person publication page:
 - e.g. https://research-information.bris.ac.uk/en/persons/benjamin-l-elsworth/publications/
 - Get URL of publication
 
+#### Run
 `snakemake -r get_person_data -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L43
 
@@ -61,6 +63,7 @@ For each publication:
 - abstract
 - year
 
+#### Run
 `snakemake -r get_research_details -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L52
 - takes a long time to query >20,000 pages
@@ -82,6 +85,7 @@ Aims:
 - Create sentence vectors for titles/abstracts  
 - Compare vectors
 
+#### Run
 `snakemake -r parse_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
 `snakemake -r process_text -j 1`
@@ -119,15 +123,29 @@ CSV files:
 
 ## Search
 
+#### Method
+
+- create indexes for sentence title and abstract vectors (https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html)
+  - also include full text indexing (https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+- Create indexes for sentence title and abstract noun_chunks
+  - not using at the moment
+
+#### Build
+
+Docker containers for Elasticsearch and Kibana
+
+`docker-compose up`
+
+#### Run
+
 Currently Elasticsearch indexes are created and populated within this repo, but should move to separate.
 
 `snakemake -r index_data -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L76
 
-Method:
-- create indexes for sentence title and abstract vectors (https://www.elastic.co/guide/en/elasticsearch/reference/current/dense-vector.html)
-  - also include full text indexing (https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
-- Create indexes for sentence title and abstract noun_chunks
-  - not using at the moment
+
+## Graph
+
+Make use of [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
 
 
