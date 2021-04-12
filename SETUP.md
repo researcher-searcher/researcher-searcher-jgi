@@ -1,10 +1,20 @@
+# Environment
+
+### Conda
+
+`conda env create -f environment.yaml
+
+### Config
+
+`mkdir config data`
+
 ### Spacy
 
 - https://spacy.io/models/en
 - https://spacy.io/universe/project/spacy-universal-sentence-encoder
 
 python -m spacy download en_core_web_lg
-python -m spacy download en_core_web_trf
+pip install spacy-universal-sentence-encoder
 
 
 ### ScispaCy
@@ -19,9 +29,6 @@ pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/e
 NER
 - pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bionlp13cg_md-0.4.0.tar.gz
 
-### Config
-
-`mkdir config data`
 
 ### Queries
 
