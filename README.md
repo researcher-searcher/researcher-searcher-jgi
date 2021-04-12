@@ -158,8 +158,8 @@ Using FastAPI docker image as starting point - https://fastapi.tiangolo.com/depl
 - modify to different version of FastAPI due to issues with Universal Sentence Encoder requirements
 
 Currently, three end points
-1. text search
-  - return person via sentence vectors
+1. text search (top 100)
+  - return person via sentence vectors 
   - return person via full text 
   - return person via person vectors
   - return publication via publication vectors
