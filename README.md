@@ -148,4 +148,5 @@ Currently Elasticsearch indexes are created and populated within this repo, but 
 
 Make use of [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
 
+![graph schema](https://github.com/elswob/researcher-searcher-jgi/blob/main/output/graph.png?raw=true)
 
