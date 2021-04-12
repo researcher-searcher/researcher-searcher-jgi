@@ -177,8 +177,9 @@ How to return a person or persons based on sentence matches?
 
 Current method:
 - create list of scores (either full text or cosine)
-- create weighted average 
-- square it
+- create weight for each score based on return order, e.g. 100 hits, top hit has weight 100
+- square the weight to reduce effect of many hits for one person, some being low scores
+- create weighted average
 
 Issues, people who mention a short phrase, e.g. machine learning, just once may be returned ahead of those who have mentioned it many times.
 
