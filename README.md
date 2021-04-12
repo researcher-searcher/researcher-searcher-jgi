@@ -136,6 +136,30 @@ Docker containers for Elasticsearch and Kibana
 
 `docker-compose up`
 
+Example index construction:
+
+```
+request_body = {
+            "settings": {
+                "number_of_shards": 5,
+                "number_of_replicas": 0,
+                "refresh_interval": -1,
+                "index.max_result_window": 100000,
+            },
+            "mappings": {
+                "dynamic": "true",
+                "_source": {"enabled": "true"},
+                "properties": {
+                    "doc_id": {"type": "keyword"},
+                    "year": {"type": "integer"},
+                    "sent_id": {"type": "keyword"},
+                    "sent_text": {"type": "text"},
+                    "sent_vector": {"type": "dense_vector", "dims": dim_size},
+                },
+            },
+        }
+```
+
 #### Run
 
 Currently Elasticsearch indexes are created and populated within this repo, but should move to separate.
