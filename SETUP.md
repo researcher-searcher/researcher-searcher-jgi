@@ -2,7 +2,7 @@
 
 ### Conda
 
-`conda env create -f environment.yaml
+`conda env create -f environment.yaml`
 
 ### Config
 
@@ -29,6 +29,12 @@ pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/e
 NER
 - pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bionlp13cg_md-0.4.0.tar.gz
 
+
+### Build
+
+Snakemake controls the build process, using cached files to avoid repeated data processing.
+
+`snakemake -r all -j 10`
 
 ### Queries
 
