@@ -10,8 +10,9 @@ Researcher Searcher for data science community at University of Bristol
 - Data sources
 - Information extraction
 - Data Processing
-- Storage (graph and Elasticsearch)
-- Search methods (API)
+- Search (needs to move to separete repo)
+- Graph (https://github.com/elswob/researcher-searcher-graph)
+- Search methods (https://github.com/elswob/researcher-searcher-api)
 
 ## Data sources
 
@@ -30,7 +31,7 @@ Really just looking for basic info for a set of people, organisations and public
 ### Find people
 
 For each email address:
-- search 
+- search https://research-information.bris.ac.uk/
 - match results back to email address
 - capture person info and page
 - e.g. https://research-information.bris.ac.uk/en/searchAll/index/?search=ben+elsworth&pageSize=25&showAdvanced=false&allConcepts=true&inferConcepts=true&searchBy=PartOfNameOrTitle
@@ -81,6 +82,8 @@ Aims:
 - Create sentence vectors for titles/abstracts  
 - Compare vectors
 
+`snakemake -r parse_text -j 1`
+- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
 `snakemake -r process_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
 
@@ -101,9 +104,6 @@ Can override the default method from sklearn tfidf-vectorizer to create tf-idf s
   - not convinced this is better for single words.... 
 - Currently creating a vector for every sentence in every title and abstract
 
-`snakemake -r parse_text -j 1`
-- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
-
 ### Calculating distances
 
 Once we have vectors for every sentence we can create distances between publications and people.
@@ -117,6 +117,17 @@ CSV files:
 - vectors for each sentence (output_id, sentence_id, vector)
 - noun chunks for each sentence (output_id, sentence_id, noun_chunk)
 
+## Search
 
+Currently Elasticsearch indexes are created and populated within this repo, but should move to separate.
+
+`snakemake -r index_data -j 1`
+- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L76
+
+Method:
+- create indexes for sentence title and abstract vectors
+  - also include full text indexing (https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)
+- Create indexes for sentence title and abstract noun_chunks
+  - not using at the moment
 
 
