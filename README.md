@@ -64,7 +64,7 @@ For each publication:
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L52
 - takes a long time to query >20,000 pages
 
-### Summary
+### Output
 
 CSV Files:
 - Person info (name, email, person_id)
@@ -79,12 +79,21 @@ CSV Files:
 Aims:
 - Extract concepts/phrases from titles/abstract
 - Create sentence vectors for titles/abstracts  
+- Compare vectors
 
-#### Concepts/phrases
+`snakemake -r process_text -j 1`
+- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
+
+### Concepts/phrases
 - Creating a concept summary for each person can be done in many ways, e.g. [gensim phrases](https://radimrehurek.com/gensim/models/phrases.html) [sklearn tfidf-vectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html)
 - Currently using [Spacy noun chunks](https://spacy.io/usage/linguistic-features#noun-chunks) then running tf-idf via sklearn
 
-#### Vectors
+### TF-IDF
+
+Can override the default method from sklearn tfidf-vectorizer to create tf-idf score for spacy noun chunks.
+- create files connecting each person to noun_chunks with tf-idf score
+
+### Vectors
 - Again, many options, partially depends on downstream requirements. 
 - Tried Spacy vectors but sentences are just averages of words (https://spacy.io/usage/linguistic-features#similarity-expectations)
   - "The similarity of Doc and Span objects defaults to the average of the token vectors. This means that the vector for “fast food” is the average of the vectors for “fast” and “food”, which isn’t necessarily representative of the phrase “fast food”."
@@ -95,12 +104,19 @@ Aims:
 `snakemake -r parse_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
 
-#### Calculating distances
+### Calculating distances
 
 Once we have vectors for every sentence we can create distances between publications and people.
 - create mean sentence vectors
 
-`snakemake -r aaa -j 1`
-- https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
-
 Example of how this can be visualised - `output/plotly.html`
+
+### Output
+
+CSV files:
+- vectors for each sentence (output_id, sentence_id, vector)
+- noun chunks for each sentence (output_id, sentence_id, noun_chunk)
+
+
+
+
