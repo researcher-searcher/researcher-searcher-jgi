@@ -114,8 +114,11 @@ Aims:
 - Compare vectors
 
 #### Run
+
 `snakemake -r parse_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
+
+
 `snakemake -r process_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
 
