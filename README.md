@@ -144,7 +144,9 @@ Can override the default method from sklearn tfidf-vectorizer to create tf-idf s
 Once we have vectors for every sentence we can create distances between publications and people.
 - create mean sentence vectors
 
-Example of how this can be visualised - `output/plotly.html`
+Example of how this can be visualised - [output/plotly.html](output/plotly.html)
+
+![Person t-SNE](https://github.com/elswob/researcher-searcher-jgi/blob/main/output/person_tsne.png?raw=true)
 
 ### Output
 
