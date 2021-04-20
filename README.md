@@ -7,14 +7,14 @@ Researcher Searcher for data science community at University of Bristol
 
 # Build process
 
-- Data sources
-- Information extraction
-- Data Processing
-- Search (needs to move to separete repo)
-- Graph (https://github.com/elswob/researcher-searcher-graph)
-- API (https://github.com/elswob/researcher-searcher-api)
+1. Data sources
+2. Information extraction
+3. Data Processing
+4. Search (needs to move to separete repo)
+5. Graph (https://github.com/elswob/researcher-searcher-graph)
+6. API (https://github.com/elswob/researcher-searcher-api)
 
-## Data sources
+## 1. Data sources
 
 ### Sources
 - List of people and email addresses from the JGI
@@ -52,7 +52,7 @@ def uob_finder_web(email):
     return person_info
 ```
 
-## Information extraction
+## 2. Information extraction
 
 Really just looking for basic info for a set of people, organisations and publications, and the connections between them.
 
@@ -106,7 +106,7 @@ CSV Files:
 - Person to org (person_id, output_id)
 - Person to output (person_id, org_id)
 
-## Data Processing
+## 3. Data Processing
 
 Aims:
 - Extract concepts/phrases from titles/abstract
@@ -114,8 +114,11 @@ Aims:
 - Compare vectors
 
 #### Run
+
 `snakemake -r parse_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L60
+
+
 `snakemake -r process_text -j 1`
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L68
 
@@ -141,7 +144,9 @@ Can override the default method from sklearn tfidf-vectorizer to create tf-idf s
 Once we have vectors for every sentence we can create distances between publications and people.
 - create mean sentence vectors
 
-Example of how this can be visualised - `output/plotly.html`
+Example of how this can be visualised - [output/plotly.html](output/plotly.html)
+
+![Person t-SNE](https://github.com/elswob/researcher-searcher-jgi/blob/main/output/person_tsne.png?raw=true)
 
 ### Output
 
@@ -149,7 +154,7 @@ CSV files:
 - vectors for each sentence (output_id, sentence_id, vector)
 - noun chunks for each sentence (output_id, sentence_id, noun_chunk)
 
-## Search
+## 4. Search
 
 #### Method
 
@@ -196,7 +201,7 @@ Currently Elasticsearch indexes are created and populated within this repo, but 
 - https://github.com/elswob/researcher-searcher-jgi/blob/main/workflow/Snakefile#L76
 
 
-## Graph
+## 5. Graph
 
 Using our [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
 - defined schemas
@@ -204,7 +209,7 @@ Using our [Neo4j build pipeline](https://github.com/elswob/neo4j-build-pipeline)
 
 ![graph schema](https://github.com/elswob/researcher-searcher-jgi/blob/main/output/graph.png?raw=true)
 
-## API
+## 6. API
 
 Using FastAPI docker image as starting point - https://fastapi.tiangolo.com/deployment/docker/
 - modify to different version of FastAPI due to issues with Universal Sentence Encoder requirements
