@@ -197,6 +197,7 @@ def tsne_people():
     m['org-name'].fillna('NA',inplace=True)
     logger.info(m.head())
     logger.info(m.shape)
+    m[['x','y','org-name','email']].to_csv('workflow/results/tsne.csv.gz',index=False)
 
     plt.figure(figsize=(16,7))
     sns.scatterplot(x='x',y='y',data=m, legend="full", style='org-name', hue='org-name')
