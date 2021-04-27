@@ -113,6 +113,9 @@ def index_vector_data(df, index_name, text_type):
     start = time.time()
 
     for i, rows in df.iterrows():
+        # skip short sentences with
+        if not len(rows["sent_text"])>50 and len(rows["sent_text"].split())>2:
+            continue
         # with gzip.open(sentence_data) as f:
         # next(f)
         counter += 1

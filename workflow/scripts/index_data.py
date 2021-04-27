@@ -27,14 +27,14 @@ people_vector = "workflow/results/people_vectors.pkl.gz"
 research_vector = "workflow/results/research_vectors.pkl.gz"
 
 def index_vectors():
-    vector_index_name = "use_title_sentence_vectors"
+    vector_index_name = "use_title_sentence_vectors_filter"
     delete_index(vector_index_name)
     create_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(vector_outfile)
     index_vector_data(
         df=df, index_name=vector_index_name, text_type='title'
     )
-    vector_index_name = "use_abstract_sentence_vectors"
+    vector_index_name = "use_abstract_sentence_vectors_filter"
     delete_index(vector_index_name)
     create_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(vector_outfile)
@@ -43,14 +43,14 @@ def index_vectors():
     )
 
 def index_mean_vectors():
-    vector_index_name = "use_person_vectors"
+    vector_index_name = "use_person_vectors_filter"
     delete_index(vector_index_name)
     create_mean_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(people_vector)
     index_mean_vector_data(
         df=df, index_name=vector_index_name, id_field='email'
     )
-    vector_index_name = "use_output_vectors"
+    vector_index_name = "use_output_vectors_filter"
     delete_index(vector_index_name)
     create_mean_vector_index(index_name=vector_index_name, dim_size=dim_size)
     df = pd.read_pickle(research_vector)
