@@ -198,7 +198,7 @@ def tsne_people():
     m.drop_duplicates(subset=['email'],inplace=True)
     logger.info(m.head())
     logger.info(m.shape)
-    m[['x','y','org-name','email','vector']].to_csv('workflow/results/tsne.csv.gz',index=False)
+    m[['x','y','org-name','email','vector']].to_pickle('workflow/results/tsne.pkl.gz')
 
     plt.figure(figsize=(16,7))
     sns.scatterplot(x='x',y='y',data=m, legend="full", style='org-name', hue='org-name')

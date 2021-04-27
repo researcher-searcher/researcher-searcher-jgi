@@ -100,8 +100,12 @@ def create_vectors(research_df, vector_data, text_type):
         sent_num = 0
         for sent in doc.sents:
             #logger.info(sent.text)
-            words = [token.text for token in sent]
-            if len(words)>2:
+            #words = [token.text for token in sent]
+            # add steps to strip words to deal with spaces being treated as words
+            words = list(filter(None,[token.text.strip() for token in sent]))
+
+            # how many words make a sentence? (special characters are incluced)
+            if len(words)>3 and len(sent.text)>50 and len(sent.text.split())>2:
                 
                 # create vectors
                 # print(doc.vector)
