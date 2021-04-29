@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import yaml
 
-configfile: 'config/date.yaml'
+configfile: 'config/data.yaml'
 
 print(config['emails'])
 

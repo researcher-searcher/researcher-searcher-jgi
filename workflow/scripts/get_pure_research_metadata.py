@@ -57,7 +57,11 @@ def create_research_data(person_df):
             logger.debug(f"{rows['email']} already done")
         else:
             url = rows["page"]
-            if not url.startswith('https:'):
+            try:
+                if not url.startswith('https:'):
+                    logger.warning(f'Bad URL: {url}')
+                    continue
+            except:
                 logger.warning(f'Bad URL: {url}')
                 continue
             research_output = get_research_output(url)

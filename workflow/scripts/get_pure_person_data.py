@@ -53,7 +53,11 @@ def create_research_data(person_df):
             logger.info(f"{rows['email']} already done")
         else:
             url = rows["page"]
-            if not url.startswith('https:'):
+            try:
+                if not url.startswith('https:'):
+                    logger.warning(f'Bad URL: {url}')
+                    continue
+            except:
                 logger.warning(f'Bad URL: {url}')
                 continue
             person_data, orcid_data = get_person_data(url)
